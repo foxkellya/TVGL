@@ -53,7 +53,7 @@ namespace TVGL_Test
                 for (var k = 1; k <= nslices; k++)
                 {
                     double X = Xmin + k * dx;
-                    double Y = Ymin+k*dy;
+                    double Y = Ymin+2*k*dy;
                     double Z = Zmin + k * dz;
 
                     Slice.OnFlat(solid,
@@ -62,10 +62,15 @@ namespace TVGL_Test
                         out List<TessellatedSolid> positiveSolids,
                         out List<TessellatedSolid> negativeSolids);
 
-                          // Slice.OnFlat(negativeSolids, new[] { 0,Y,0})
 
-                    //Presenter.ShowAndHang(positiveSolids);
-                    Presenter.ShowAndHang(negativeSolids);
+                    Slice.OnFlat(negativeSolids,
+                    new Flat(new[] { 0, Y, 0 }, new[]
+                    { 0,1.0,0}),
+                    out List<TessellatedSolid> positiveSolidsYslice,
+                    out List<TessellatedSolid> negativeSolidsYslice);
+
+                    Presenter.ShowAndHang(positiveSolids);
+                    Presenter.ShowAndHang(negativeSolidsYslice);
 
 
                 }
