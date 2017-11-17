@@ -53,7 +53,7 @@ namespace TVGL_Test
                 for (var k = 1; k <= nslices; k++)
                 {
                     double X = Xmin + k * dx;
-                    double Y = Ymin+2*k*dy;
+                    double Y = Ymin+ k*dy;
                     double Z = Zmin + k * dz;
 
                     Slice.OnFlat(solid,
@@ -61,16 +61,35 @@ namespace TVGL_Test
                         { dirarray[d,0],dirarray[d,1],dirarray[d,2] }),
                         out List<TessellatedSolid> positiveSolids,
                         out List<TessellatedSolid> negativeSolids);
+                    Console.WriteLine(negativeSolids);
+                    Console.WriteLine("Display negative solids after cut in X");
+                    Presenter.ShowAndHang(negativeSolids);
 
 
-                    Slice.OnFlat(negativeSolids,
-                    new Flat(new[] { 0, Y, 0 }, new[]
-                    { 0,1.0,0}),
-                    out List<TessellatedSolid> positiveSolidsYslice,
-                    out List<TessellatedSolid> negativeSolidsYslice);
+                    foreach (TessellatedSolid ts in negativeSolids)
+                    {
+                        //idea: get new min and max of new solids and then iterate through them
+                        var Xmaxts = ts.XMax;
+                        var Ymaxts = ts.YMax;
+                        var Zmaxts = ts.ZMax;
+                        var Xmints = ts.XMin;
+                        var Ymints = ts.YMin;
+                        var Zmints = ts.ZMin;
+                        Console.WriteLine(Zmints);
+                        Presenter.ShowAndHang(ts);
 
-                    Presenter.ShowAndHang(positiveSolids);
-                    Presenter.ShowAndHang(negativeSolidsYslice);
+                        double Yhalf = (Ymints+Ymaxts)/2;
+                        Slice.OnFlat(ts,
+                        new Flat(new[] { 0, Yhalf, 0 }, new[]
+                        { 0,1.0,0}),
+                        out List<TessellatedSolid> positiveSolidsYslice,
+                        out List<TessellatedSolid> negativeSolidsYslice);
+                        Console.WriteLine("Display negative solids after another y slice");
+                        Presenter.ShowAndHang(negativeSolidsYslice);
+                    }
+
+                    
+                   
 
 
                 }
