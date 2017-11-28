@@ -67,27 +67,43 @@ namespace TVGL_Test
                     for (var m = 1; m <= nyslices; m++)
                     {
                         
-                        double Y = Yminsm + m * dy;
-
-                        Slice.OnFlat(smsolid,
-                        new Flat(new[] { 0, Y, 0 }, new[]
+                        double Y1 = Yminsm + m * dy;
+                        List<TessellatedSolid> negativeSolidsYslice1 = new List<TessellatedSolid>();
+                        if (Y1 == Ymaxsm)
+                        {
+                            negativeSolidsYslice1.Add(smsolid);
+                            Console.WriteLine("Display negative solids after YMAX");
+                            Presenter.ShowAndHang(negativeSolidsYslice1);
+                        }
+                        else
+                            Slice.OnFlat(smsolid,
+                        new Flat(new[] { 0, Y1, 0 }, new[]
                         { 0,1.0,0}),
                         out List<TessellatedSolid> positiveSolidsYslice1,
-                        out List<TessellatedSolid> negativeSolidsYslice1);
-                        Console.WriteLine("Display negative solids after a y slice");
+                        out negativeSolidsYslice1);
+                        Console.WriteLine("Display negative solids after a Y1 slice");
                         Presenter.ShowAndHang(negativeSolidsYslice1);
 
                         foreach (TessellatedSolid smsolid2 in negativeSolidsYslice1)
                         {
                             double Y2 = Yminsm + (m - 1) * dy;
-                            Slice.OnFlat(smsolid2,
-                            new Flat(new[] { 0, Y2, 0 }, new[]
-                            { 0,1.0,0}),
-                            out List<TessellatedSolid> positiveSolidsYslice2,
-                            out List<TessellatedSolid> negativeSolidsYslice2);
-                            Console.WriteLine("Display positive solids after another Y2slice");
-                            Presenter.ShowAndHang(positiveSolidsYslice2);
-
+                            List<TessellatedSolid> positiveSolidsYslice2 = new List<TessellatedSolid>();
+                            if (Y2 == Yminsm)
+                            {
+                                positiveSolidsYslice2.Add(smsolid2);
+                                Console.WriteLine("Display negative solids after YMIN");
+                                Presenter.ShowAndHang(positiveSolidsYslice2);
+                            }
+                            else
+                            {
+                                Slice.OnFlat(smsolid2,
+                                new Flat(new[] { 0, Y2, 0 }, new[]
+                                { 0,1.0,0}),
+                                out positiveSolidsYslice2,
+                                out List<TessellatedSolid> negativeSolidsYslice2);
+                                Console.WriteLine("Display positive solids after another Y2slice");
+                                Presenter.ShowAndHang(positiveSolidsYslice2);
+                            }
                             //run through the z direction
                             foreach (TessellatedSolid xsmsolid in positiveSolidsYslice2)
                             {
@@ -122,33 +138,33 @@ namespace TVGL_Test
 
                                         Presenter.ShowAndHang(negativeSolidsZslice1);
                                     }
-                                    foreach (TessellatedSolid xxsmallsolid in negativeSolidsZslice1)
+                                    foreach (TessellatedSolid xsmallsolid2 in negativeSolidsZslice1)
                                     {
 
                                         double Z2 = Zminxsm + (n - 1) * dz;
                                         List<TessellatedSolid> positiveSolidsZslice2 = new List<TessellatedSolid>();
                                         if (Z2 == Zminxsm)
                                         {
-                                            positiveSolidsZslice2.Add(xxsmallsolid);
+                                            positiveSolidsZslice2.Add(xsmallsolid2);
                                             Console.WriteLine("Display negative solids after ZMIN");
                                             Presenter.ShowAndHang(positiveSolidsZslice2);
                                         }
                                       
                                         else
                                         {
-                                            Slice.OnFlat(xxsmallsolid,
+                                            Slice.OnFlat(xsmallsolid2,
                                             new Flat(new[] { 0, 0, Z2 }, new[]
                                             { 0,0,1.0}),
                                             out positiveSolidsZslice2,
                                             out List<TessellatedSolid> negativeSolidsZslice2);
-                                            Console.WriteLine("Display negative solids after another z2slice");
+                                            Console.WriteLine("Display positive solids after another z2slice");
                                             Presenter.ShowAndHang(positiveSolidsZslice2);
                                         }
                                         foreach (TessellatedSolid finalsolid in positiveSolidsZslice2)
                                         {
                                             //save solids to a list
                                             volumeslist.Add(finalsolid);
-                                            Console.WriteLine("Display negative solids FINAL");
+                                            Console.WriteLine("Display positive solids FINAL");
                                             Presenter.ShowAndHang(positiveSolidsZslice2);
                                         }
 
