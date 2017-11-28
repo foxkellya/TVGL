@@ -35,8 +35,6 @@ namespace TVGL_Test
             
                 var Xmax = solid.XMax;
                 var Xmin = solid.XMin;
-                //define array of directions
-               // double[,] dirarray = { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 } };
 
                 //define the number of slices desired and creates small slices, dx
                     double nxslices = 5;
@@ -68,56 +66,93 @@ namespace TVGL_Test
 
                     for (var m = 1; m <= nyslices; m++)
                     {
+                        
                         double Y = Yminsm + m * dy;
+
                         Slice.OnFlat(smsolid,
                         new Flat(new[] { 0, Y, 0 }, new[]
                         { 0,1.0,0}),
-                        out List<TessellatedSolid> positiveSolidsYslice,
-                        out List<TessellatedSolid> negativeSolidsYslice);
+                        out List<TessellatedSolid> positiveSolidsYslice1,
+                        out List<TessellatedSolid> negativeSolidsYslice1);
                         Console.WriteLine("Display negative solids after a y slice");
-                        Presenter.ShowAndHang(negativeSolidsYslice);
+                        Presenter.ShowAndHang(negativeSolidsYslice1);
 
-                        //run through the z direction
-                        foreach (TessellatedSolid xsmsolid in negativeSolidsYslice)
+                        foreach (TessellatedSolid smsolid2 in negativeSolidsYslice1)
                         {
+                            double Y2 = Yminsm + (m - 1) * dy;
+                            Slice.OnFlat(smsolid2,
+                            new Flat(new[] { 0, Y2, 0 }, new[]
+                            { 0,1.0,0}),
+                            out List<TessellatedSolid> positiveSolidsYslice2,
+                            out List<TessellatedSolid> negativeSolidsYslice2);
+                            Console.WriteLine("Display positive solids after another Y2slice");
+                            Presenter.ShowAndHang(positiveSolidsYslice2);
 
-                            //get new min and max of new solids and then iterate through them
-                            var Zmaxxsm = xsmsolid.ZMax;
-                            var Zminxsm = xsmsolid.ZMin;
-
-                            //create size of slices
-                            double nzslices = 10;
-                            double dz = (Zmaxxsm - Zminxsm) / nzslices;
-                            //create set of z values to iterate through
-
-                            for (var n = 1; n <= nzslices; n++)
+                            //run through the z direction
+                            foreach (TessellatedSolid xsmsolid in positiveSolidsYslice2)
                             {
-                                double Z1= Zminxsm + n * dz;
-                                Slice.OnFlat(xsmsolid,
-                                new Flat(new[] { 0, 0, Z1}, new[]
-                                { 0,0,1.0}),
-                                out List<TessellatedSolid> positiveSolidsZslice1,
-                                out List<TessellatedSolid> negativeSolidsZslice1);
-                                //Console.WriteLine("Display negative solids after another z1slice");
-                                
-                                //Presenter.ShowAndHang(negativeSolidsZslice1);
-                                foreach (TessellatedSolid xxsmallsolid in negativeSolidsZslice1)
-                                {
-                                    double Z2 = Zminxsm + (n - 1) * dz;
-                                    Slice.OnFlat(xxsmallsolid,
-                                    new Flat(new[] { 0, 0, Z2 }, new[]
-                                    { 0,0,1.0}),
-                                    out List<TessellatedSolid> positiveSolidsZslice2,
-                                    out List<TessellatedSolid> negativeSolidsZslice2);
-                                    Console.WriteLine("Display negative solids after another z2slice");
-                                    Presenter.ShowAndHang(positiveSolidsZslice2);
 
-                                    foreach (TessellatedSolid finalsolid in positiveSolidsZslice2)
+                                //get new min and max of new solids and then iterate through them
+                                var Zmaxxsm = xsmsolid.ZMax;
+                                var Zminxsm = xsmsolid.ZMin;
+
+                                //create size of slices
+                                double nzslices = 10;
+                                double dz = (Zmaxxsm - Zminxsm) / nzslices;
+                                //create set of z values to iterate through
+
+                                for (var n = 1; n <= nzslices; n++)
+                                {
+                                    double Z1 = Zminxsm + n * dz;
+                                    List<TessellatedSolid> negativeSolidsZslice1 = new List<TessellatedSolid>();
+                                    if (Z1 == Zmaxxsm)
                                     {
-                                        //save solids to a list
-                                        volumeslist.Add(finalsolid);
+                                        negativeSolidsZslice1.Add(xsmsolid);
+                                        Console.WriteLine("Display negative solids after ZMAX");
+                                        Presenter.ShowAndHang(negativeSolidsZslice1);
                                     }
-                                
+                                    else
+                                    {
+                                        Slice.OnFlat(xsmsolid,
+                                        new Flat(new[] { 0, 0, Z1 }, new[]
+                                        { 0,0,1.0}),
+                                        out List<TessellatedSolid> positiveSolidsZslice1,
+                                        out negativeSolidsZslice1);
+                                        Console.WriteLine("Display negative solids after another z1slice");
+
+                                        Presenter.ShowAndHang(negativeSolidsZslice1);
+                                    }
+                                    foreach (TessellatedSolid xxsmallsolid in negativeSolidsZslice1)
+                                    {
+
+                                        double Z2 = Zminxsm + (n - 1) * dz;
+                                        List<TessellatedSolid> positiveSolidsZslice2 = new List<TessellatedSolid>();
+                                        if (Z2 == Zminxsm)
+                                        {
+                                            positiveSolidsZslice2.Add(xxsmallsolid);
+                                            Console.WriteLine("Display negative solids after ZMIN");
+                                            Presenter.ShowAndHang(positiveSolidsZslice2);
+                                        }
+                                      
+                                        else
+                                        {
+                                            Slice.OnFlat(xxsmallsolid,
+                                            new Flat(new[] { 0, 0, Z2 }, new[]
+                                            { 0,0,1.0}),
+                                            out positiveSolidsZslice2,
+                                            out List<TessellatedSolid> negativeSolidsZslice2);
+                                            Console.WriteLine("Display negative solids after another z2slice");
+                                            Presenter.ShowAndHang(positiveSolidsZslice2);
+                                        }
+                                        foreach (TessellatedSolid finalsolid in positiveSolidsZslice2)
+                                        {
+                                            //save solids to a list
+                                            volumeslist.Add(finalsolid);
+                                            Console.WriteLine("Display negative solids FINAL");
+                                            Presenter.ShowAndHang(positiveSolidsZslice2);
+                                        }
+
+                                    }
                                 }
                             }
                         }
