@@ -37,7 +37,8 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             double nxslices = 5;
-            double dx = (Xmax - Xmin) / nxslices;
+            double dx1 = (Xmax - Xmin) / nxslices;
+            double dx = Math.Abs(dx1);
 
             for (var k = 1; k <= nxslices; k++)
             {
@@ -86,8 +87,8 @@ namespace TVGL_Test
                     else
                     {
                         Slice.OnFlat(solid2,
-                        new Flat(new[] { 0, X2, 0 }, new[]
-                        { 0,1.0,0}),
+                        new Flat(new[] { X2, 0, 0 }, new[]
+                        { 1.0,0,0}),
                         out positiveSolidsXslice2,
                         out List<TessellatedSolid> negativeSolidsXslice2);
                         Console.WriteLine("Display positive solids after another X2slice");
@@ -103,7 +104,8 @@ namespace TVGL_Test
                         var Ymaxsm = smsolid.YMax;
                         var Yminsm = smsolid.YMin;
                         double nyslices = 5;
-                        double dy = (Ymaxsm - Yminsm) / nyslices;
+                        double dy1 = (Ymaxsm - Yminsm) / nyslices;
+                        double dy = Math.Abs(dy1);
 
     
                         for (var m = 1; m <= nyslices; m++)
@@ -166,8 +168,9 @@ namespace TVGL_Test
                                     //on new solids: define the number of slices desired and creates small slices, dz
                                     var Zmaxxsm = xsmsolid.ZMax;
                                     var Zminxsm = xsmsolid.ZMin;
-                                    double nzslices = 10;
-                                    double dz = (Zmaxxsm - Zminxsm) / nzslices;
+                                    double nzslices = 20;
+                                    double dz1 = (Zmaxxsm - Zminxsm) / nzslices;
+                                    double dz = Math.Abs(dz1);
                                     
                                     for (var n = 1; n <= nzslices; n++)
                                     {
@@ -247,12 +250,13 @@ namespace TVGL_Test
 
 
                 }
-                Presenter.ShowAndHang(volumeslist);
-                Console.WriteLine("Completed.");
-                Console.ReadKey();
+               
                 
 
             }
+                 Presenter.ShowAndHang(volumeslist);
+                Console.WriteLine("Completed.");
+                Console.ReadKey();
             
         }
     }
