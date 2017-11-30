@@ -53,6 +53,10 @@ namespace TVGL_Test
                     Console.WriteLine("Display negative solids after XMAX");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
                 }
+                else if (X1>Xmax)
+                {
+                    Console.WriteLine("got x problem");
+                }
                 else
                 {
                     //returns negative solids after first x cut
