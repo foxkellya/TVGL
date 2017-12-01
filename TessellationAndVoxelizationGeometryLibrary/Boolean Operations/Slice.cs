@@ -37,6 +37,7 @@ namespace TVGL.Boolean_Operations
                 positiveSideSolids = new List<TessellatedSolid>();
                 negativeSideSolids = new List<TessellatedSolid>();
                 Debug.WriteLine("CuttingPlane does not cut through the given solid.");
+                //Presenter.ShowAndHang(positiveSolidsZslice2)
                 return;
             };
             MakeSolids(contactData, ts.Units, out positiveSideSolids, out negativeSideSolids);
