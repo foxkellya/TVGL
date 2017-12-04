@@ -21,6 +21,7 @@ using System.Threading;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using OxyPlot;
+using System;
 
 namespace TVGL
 {
@@ -795,13 +796,14 @@ namespace TVGL
         /// <returns>Visual3D.</returns>
         private static Visual3D MakeModelVisual3D(TessellatedSolid ts)
         {
+            var rand = new Random();
             var defaultMaterial = MaterialHelper.CreateMaterial(
                 new System.Windows.Media.Color
                 {
                     A = ts.SolidColor.A,
-                    B = ts.SolidColor.B,
-                    G = ts.SolidColor.G,
-                    R = ts.SolidColor.R
+                    B = (byte)rand.Next(180,255),
+                    G = (byte)rand.Next(180, 255),
+                    R = (byte)rand.Next(180, 255)
                 });
             if (ts.HasUniformColor)
             {
