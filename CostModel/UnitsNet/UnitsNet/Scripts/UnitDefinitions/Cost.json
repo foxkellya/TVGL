@@ -1,0 +1,59 @@
+﻿{
+  "Name": "Cost",
+  "BaseUnit": "Dollar",
+  "XmlDoc": "Cost is the value of somethign in dollars. No currencies are included, so dollars in ambiguous.",
+  "Units": [
+    {
+      "SingularName": "Dollar",
+      "PluralName": "Dollars",
+      "FromUnitToBaseFunc": "x",
+      "FromBaseToUnitFunc": "x",
+      "Localization": [
+        {
+          "Culture": "en-US",
+          "Abbreviations": [ "USD", "dollar", "dollars" ]
+        }
+      ]
+    },
+    {
+      "SingularName": "Thousand",
+      "PluralName": "Thousands",
+      "FromUnitToBaseFunc": "x*(1e+3)",
+      "FromBaseToUnitFunc": "x*(1e-3)",
+      "Localization": [
+        {
+          "Culture": "en-US",
+          "Abbreviations": [ "thousand", "thousands" ]
+        }
+      ]
+    },
+    {
+      "SingularName": "Million",
+      "PluralName": "Millions",
+      "FromUnitToBaseFunc": "x*(1e+6)",
+      "FromBaseToUnitFunc": "x*(1e-6)",
+      "Localization": [
+        {
+          "Culture": "en-US",
+          "Abbreviations": [ "million", "millions" ]
+        }
+      ]
+    },
+    {
+      "SingularName": "Billion",
+      "PluralName": "Billions",
+      "FromUnitToBaseFunc": "x*(1e+9)",
+      "FromBaseToUnitFunc": "x*(1e-9)",
+      "Localization": [
+        {
+          "Culture": "en-US",
+          "Abbreviations": [ "billion", "billions" ]
+        },
+        {
+          "Culture": "ru-RU",
+          "Abbreviations": [ "д" ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+﻿{
+    "Name": "CostPerDistance",
+    "BaseUnit": "DollarPerMeter",
+    "XmlDoc": "The price of so something per unit distance (absolute value of length). Ex. Waterjetting cost is calculated in dollars per inch.",
+    "Units": [
+      {
+        "SingularName": "DollarPerMeter",
+        "PluralName": "DollarsPerMeter",
+        "FromUnitToBaseFunc": "Math.Abs(x)",
+        "FromBaseToUnitFunc": "Math.Abs(x)",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/m", "dollar/m", "dollars/m" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerCentimeter",
+        "PluralName": "DollarsPerCentimeter",
+        "FromUnitToBaseFunc": "Math.Abs(x)*1e+2",
+        "FromBaseToUnitFunc": "Math.Abs(x)*1e-2",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/cm", "dollar/cm", "dollars/cm" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerMillimeter",
+        "PluralName": "DollarsPerMillimeter",
+        "FromUnitToBaseFunc": "Math.Abs(x)*1e+3",
+        "FromBaseToUnitFunc": "Math.Abs(x)*1e-3",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/mm", "dollar/mm", "dollars/mm" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerKilometer",
+        "PluralName": "DollarsPerKilometer",
+        "FromUnitToBaseFunc": "Math.Abs(x)*1e-3",
+        "FromBaseToUnitFunc": "Math.Abs(x)*1e+3",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/km", "dollar/km", "dollars/km" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerInch",
+        "PluralName": "DollarsPerInch",
+        "FromUnitToBaseFunc": "Math.Abs(x)/0.0254",
+        "FromBaseToUnitFunc": "Math.Abs(x)*0.0254",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/in", "dollar/in", "dollars/in" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerFoot",
+        "PluralName": "DollarsPerFoot",
+        "FromUnitToBaseFunc": "Math.Abs(x)/0.3048",
+        "FromBaseToUnitFunc": "Math.Abs(x)*0.3048",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/ft", "dollar/ft", "dollars/ft" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerMile",
+        "PluralName": "DollarsPerMile",
+        "FromUnitToBaseFunc": "Math.Abs(x)/1609.34",
+        "FromBaseToUnitFunc": "Math.Abs(x)*1609.34",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/mi", "dollar/mi", "dollars/mi" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerNauticalMile",
+        "PluralName": "DollarsPerNauticalMile",
+        "FromUnitToBaseFunc": "Math.Abs(x)/1852",
+        "FromBaseToUnitFunc": "Math.Abs(x)*1852",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/nmi", "dollar/nmi", "dollars/nmi" ]
+          }
+        ]
+      }
+
+    ]
+}
