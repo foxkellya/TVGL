@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows.Documents;
-using BoeingInputs;
-using PropertyTools.Wpf;
+using GenericInputs;
+using PropertyTools.DataAnnotations;
 using StarMathLib;
 using TVGL;
 using TVGL.IOFunctions;
@@ -16,6 +13,34 @@ using Point = TVGL.Point;
 
 namespace KatanaObjects.BaseClasses
 {
+    public enum BlankType
+    {
+        [Description("Waterjet Plate")]
+        WaterJetPlate,
+
+        [Description("Rectangular Bar Stock")]
+        RectangularBarStock,
+
+        [Description("Circular Bar Stock")]
+        CircularBarStock,
+
+        [Description("Hollow Tube")]
+        HollowTube,
+
+        [Description("Closed-Die Forging")]
+        ClosedDieForging,
+
+        [Description("Wire Feedstock")] //NEED TO CHANGE VARIABLE NAMES - ONLY CHANGED TAGS
+        AdditiveFeedStock,
+
+        [Description("Near-Net Additive")]
+        NearNetAdditive,
+
+        //Assembly Blank Type. Not included in User Interface or the search process.
+        [Description("Assembly")]
+        Assembly
+    }
+
     public class SubVolume
     {
         #region Private Properties
@@ -43,7 +68,6 @@ namespace KatanaObjects.BaseClasses
         private bool _waterjetShapeHasBeenSet = false;
         private bool _waterjetShapeIsFeasible = false;
         private readonly Lazy<TessellatedSolid> _waterjetStockSolid;
-        private  WaterjetPlateSize _waterjetPlateSize;
 
         //Forging
         public List<ForgingShapeData> _minForgingBlankData;
@@ -76,14 +100,6 @@ namespace KatanaObjects.BaseClasses
         private Length _rectangularBlankDistanceAlongBuildDirection; //Distance along the direction to build the .STL file.
         private readonly Lazy<TessellatedSolid> _rectangularBlankSolid;
         private IList<List<Point>> _rectangularBlankPath;
-
-        //Rectangular bar stock
-        private RectangularBarStockSize _rectangularBarStockSize;
-
-        //Rectangular plate 
-        private RectangularPlateSize _rectangularPlateSize;
-
-        //Forged Rectangular Bar
 
         //Hollow HollowTube
         private double[] _hollowTubeDirection;
@@ -198,16 +214,6 @@ namespace KatanaObjects.BaseClasses
                 return _waterjetShapeIsFeasible;
             }
             private set { _waterjetShapeIsFeasible = value; }
-        }
-
-        public WaterjetPlateSize WaterjetPlateSize
-        {
-            get
-            {
-                if (!_waterjetShapeHasBeenSet) SetWaterjetShape();
-                return _waterjetPlateSize;
-            }
-            private set { _waterjetPlateSize = value; }
         }
 
         public IList<List<Point>> WaterjetShape
@@ -400,24 +406,6 @@ namespace KatanaObjects.BaseClasses
                 return _rectangularBlankSolid.Value;
             }
         }
-
-        public RectangularPlateSize RectangularPlateSize
-        {
-            get
-            {
-                if (!_rectangularBlankDimensionsHaveBeenSet) SetAllRectangularBlankDimensions();
-                return _rectangularPlateSize;
-            }
-        }
-
-        public RectangularBarStockSize RectangularBarStockSize
-        {
-            get
-            {
-                if (!_rectangularBlankDimensionsHaveBeenSet) SetAllRectangularBlankDimensions();
-                return _rectangularBarStockSize;
-            }
-        }
         #endregion
 
         #region Hollow Tube
@@ -517,7 +505,7 @@ namespace KatanaObjects.BaseClasses
         #endregion
 
         #region Constructor
-        public SubVolume(TessellatedSolid solid, Flat flat, ISet<BlankType> blankTypes, 
+        public SubVolume(TessellatedSolid solid, ISet<BlankType> blankTypes, 
             SearchInputs searchInputs = null, List<List<Point>> machinedPartShapeOnPlane = null )
         {
             //Initialize some public parameters
@@ -532,16 +520,10 @@ namespace KatanaObjects.BaseClasses
             SolidColor = solid.SolidColor;
             SolidVolume = Volume.FromTesselatedSolidBaseUnit(Solid.Volume, SolidUnitString);
             SurfaceArea = Area.FromTesselatedSolidBaseUnit(Solid.SurfaceArea, SolidUnitString);
-            Flat = flat;
             _waterjetShapeHasBeenSet = false;
             _hollowTubeDimensionsHaveBeenSet = false;
             if (searchInputs != null) _searchInputs = searchInputs;
 
-            //General. These properties are always calculated
-            if (Flat != null)
-            {
-                _subvolumeDepthAlongPlaneNormal = GetSubvolumeDepthAlongPlaneNormal();
-            }
             _minimumBoundingBox = GetMinimumBoundingBox(); //Must come before GetProjectedPoints()
             _projectedPoints = GetProjectedPoints();
             _convexHull2D = GetConvexHull2D();
@@ -555,8 +537,7 @@ namespace KatanaObjects.BaseClasses
             //Additive
             //The flat is null only for the seed. So, if flat is null, we can consider near net additive, but past 
             //the seed we are actually considering additive feedstock.
-            if ((flat == null && blankTypes.Contains(BlankType.NearNetAdditive)) || 
-                (flat != null && blankTypes.Contains(BlankType.AdditiveFeedStock)))
+            if (blankTypes.Contains(BlankType.NearNetAdditive))
             {
                 AdditiveShapeOnPlane = GetAdditiveSilhouette();
                 AdditiveVolume = GetAdditiveVolume();
@@ -604,9 +585,7 @@ namespace KatanaObjects.BaseClasses
                 _hollowTubeStockSolid = new Lazy<TessellatedSolid>(GetHollowTubeStockSolid);
             }
             //Rectangular Blanks
-            if (blankTypes.Contains(BlankType.RectangularBarStock)
-                || blankTypes.Contains(BlankType.RectangularPlate)
-                || blankTypes.Contains(BlankType.ForgedRectangularBar))
+            if (blankTypes.Contains(BlankType.RectangularBarStock))
             {
                 SetAllRectangularBlankDimensions();
                 RectangularBlankVolume = GetRectangularBlankVolume();
@@ -615,114 +594,7 @@ namespace KatanaObjects.BaseClasses
                 //Tesselated Solids are not set to lower memory because they are not needed in all cases.
                 _rectangularBlankSolid = new Lazy<TessellatedSolid>(GetRectangularBlankSolid);
             }
-        }
-
-        //This creator is specifically for blank based.
-        //It requires additional method calls (e.g. SetAdditiveBlankInfo()) for each blank type to fully define the subvolume
-        public SubVolume(Flat flat, string solidUnitString, double subvolumeDepthAlongPlaneNormal, BoundingBox minimumBoundingBoxAlongNormal, List<Point> convexHull2D,
-            List<List<Point>> silhouetteAlongNormal, List<List<Point>> machinedPartShapeOnPlane, SearchInputs searchInputs,
-            double solidVolume, double solidSurfaceArea)
-        {
-            //Initialize some public parameters
-            //Unless otherwise noted, the blank types are feasible
-            AdditiveIsFeasible = true;
-            CircularBarIsFeasible = true;
-            ForgingIsFeasible = true;
-            NearNetPrintedShapeIsFeasible = true;
-
-            MachinedPartShapeOnPlane = machinedPartShapeOnPlane;
-            SolidUnitString = solidUnitString;
-            Solid = null;
-            SolidColor = new Color(KnownColors.Beige);
-            SolidVolume = Volume.FromTesselatedSolidBaseUnit(solidVolume, SolidUnitString);
-            SurfaceArea = Area.FromTesselatedSolidBaseUnit(solidSurfaceArea, SolidUnitString);
-            Flat = flat;
-            _waterjetShapeHasBeenSet = false;
-            _hollowTubeDimensionsHaveBeenSet = false;
-            if (searchInputs != null) _searchInputs = searchInputs;
-
-            //General
-            _subvolumeDepthAlongPlaneNormal = Length.FromTesselatedSolidBaseUnit(subvolumeDepthAlongPlaneNormal, SolidUnitString);
-            _minimumBoundingBox = minimumBoundingBoxAlongNormal;
-            _projectedPoints = null;
-            _convexHull2D = convexHull2D;
-            _silhouetteAlongNormal = silhouetteAlongNormal;
-           
-            //Initialize all the lazy parameters. All other parameters are set using functions for each blank.
-
-            //Additive cross sections are not set to lower memory because they are not needed in all cases.
-            //"SetAdditiveCrossSections" is used instead of "Get" method, so that the value can be pre-set
-            //The "get stock" method is the same as usual.
-            _additiveCrossSections = new Lazy<List<List<List<double[]>>>>(SetAdditiveCrossSections);
-            //Forgin cross sections are not set to lower memory because they are not needed in all cases.
-            _forgingCrossSections = new Lazy<List<List<List<double[]>>>>(GetForgingCrossSections);
-
-            //Tesselated Solids are not set to lower memory because they are not needed in all cases.
-            _additiveStockSolid = new Lazy<TessellatedSolid>(GetAdditiveStockSolid);
-            _waterjetStockSolid = new Lazy<TessellatedSolid>(GetWaterjetStockSolid);
-            _circularBarStockSolid = new Lazy<TessellatedSolid>(GetCircularBarStockSolid);
-            _hollowTubeStockSolid = new Lazy<TessellatedSolid>(GetHollowTubeStockSolid);
-            _rectangularBlankSolid = new Lazy<TessellatedSolid>(GetRectangularBlankSolid);
-            _forgingStockSolid = new Lazy<TessellatedSolid>(GetForgingStockSolid);
-        }
-
-        public void SetRectangularBlankInfo(BoundingBox minimumBoundingBox, double[] rectangularBlankNormalDirection, 
-            double distanceFromOriginToBlankCenter)
-        {
-            SetAllRectangularBlankDimensions(minimumBoundingBox, rectangularBlankNormalDirection);
-            RectangularBlankVolume = GetRectangularBlankVolume();
-            RectangularBlankAreaOnPlane = GetRectangularBlankAreaOnPlane();
-            RectangularBlankCrossSections = GetRectangularBlankCrossSections(distanceFromOriginToBlankCenter);
-            RectangularBlankShapeOnCuttingPlane = new List<List<Point>>
-            {
-                GetRectangularBlankShapeOnCuttingPlane(
-                    RectangularBlankCrossSections[0][0], Flat.Normal, RectangularBlankCrossSectionBuildDirection,
-                    _rectangularBlankDistanceAlongBuildDirection)
-            };
-            RectangularBlankPerimeterOnPlane =
-                Length.FromTesselatedSolidBaseUnit(
-                    RectangularBlankShapeOnCuttingPlane.Sum(path => MiscFunctions.Perimeter(path)), SolidUnitString);
-        }
-
-        public void SetAdditiveBlankInfo(List<List<Point>> additiveShapeOnPlane, Volume additiveVolume, 
-            double[] additiveBuildDirection, List<List<List<double[]>>> additiveCrossSections)
-        {
-            AdditiveShapeOnPlane = additiveShapeOnPlane;
-            AdditiveVolume = additiveVolume;
-            AdditiveBuildDirection = additiveBuildDirection;
-            AdditiveAreaOnPlane = GetAdditiveAreaOnPlane(); //This function only uses AdditiveShapeOnPlane
-            AdditivePerimeterOnPlane = GetAdditivePerimeterOnPlane(); //This function only uses AdditiveShapeOnPlane
-            //This _temp parameter is a bit sloppy, but works to allow the cross sections to be lazy.
-            _tempAdditiveCrossSections = additiveCrossSections;
-        }
-        private List<List<List<double[]>>> _tempAdditiveCrossSections;
-        private List<List<List<double[]>>> SetAdditiveCrossSections()
-        {
-            return _tempAdditiveCrossSections;
-        }
-
-        public void SetWaterjetPlateBlankInfo(double[] waterjetDirection, WaterjetPlateSize waterjetPlateSize,
-            List<List<Point>> waterjetShape,  bool waterjetIsFeasible,
-            List<List<Point>> waterjetShapeOnCuttingPlane,
-            double originToSubvolumeCenterAlongWaterjetDirection, 
-            double subvolumeDepthAlongPlaneNormal)
-        {
-            //We cannot use the internal SetWaterjetShape funtion, since it will find the silhouette along the build direction
-            //that it identifies, but we have already found this information in blank based.
-            SetWaterjetShape(waterjetDirection, waterjetPlateSize, waterjetShape, waterjetIsFeasible);
-            if (!waterjetIsFeasible) return;
-            WaterjetVolume = GetWaterjetVolume();
-            WaterjetCuttingPerimeter = GetWaterjetCuttingPerimeter();
-
-            WaterjetShapeOnCuttingPlane = waterjetShapeOnCuttingPlane;
-            WaterjetPerimeterOnPlane =
-                Length.FromTesselatedSolidBaseUnit(
-                    waterjetShapeOnCuttingPlane.Sum(path => MiscFunctions.Perimeter(path)), SolidUnitString);       
-
-            //ToDo:IDeally this next value would have the offsets included, however, it is not used is an exact manner, just a comparison
-            WaterjetDistanceAlongJoinDirection = Length.FromTesselatedSolidBaseUnit(subvolumeDepthAlongPlaneNormal, SolidUnitString);
-            WaterjetCrossSections = GetWaterjetCrossSections(originToSubvolumeCenterAlongWaterjetDirection);
-        }
+        } 
         #endregion
 
         #region Rectangular Blanks
@@ -738,17 +610,14 @@ namespace KatanaObjects.BaseClasses
         //This method mostly uses static inputs, but is non-static because it sets global rectangular blank information
         internal void SetAllRectangularBlankDimensions(BoundingBox minimumBoundingBox, double[] rectangularBlankNormalDirection)
         {
-            BlankType rectangularBlankType;
             int thicknessDirectionInt, lengthDirectionInt, widthDirectionInt; 
             Length length, width, thickness, distanceAlongNormal;
-            RectangularPlateSize rectangularPlateSize;
-            RectangularBarStockSize rectangularBarStockSize;
             List<Point> rectangularBlankPath;
             List<Vertex> rectangularBlankVertexPath;
             GetRectangularBlankDimensions(minimumBoundingBox, rectangularBlankNormalDirection,
-                SolidUnitString, _searchInputs, out length, out width, out thickness, out distanceAlongNormal, out rectangularBlankType,
-                out thicknessDirectionInt, out lengthDirectionInt, out widthDirectionInt, out rectangularPlateSize, 
-                out rectangularBarStockSize, out rectangularBlankPath, out rectangularBlankVertexPath);
+                SolidUnitString, _searchInputs, out length, out width, out thickness, out distanceAlongNormal,
+                out thicknessDirectionInt, out lengthDirectionInt, out widthDirectionInt,
+                out rectangularBlankPath, out rectangularBlankVertexPath);
 
             //Set the rectangular blank dimensions that are not unique to the type of blank
             _rectangularBlankWidth = width;
@@ -759,31 +628,7 @@ namespace KatanaObjects.BaseClasses
             _rectangularBlankBuildDirection = rectangularBlankNormalDirection; //ToDo: erase this build direction
             _rectangularBlankDistanceAlongBuildDirection = distanceAlongNormal; //ToDo: erase this build direction
             _rectangularBlankPath = new List<List<Point>>() { rectangularBlankPath};
-
-            //Set the blank dimensions that are uniue, depending on the type of blank
-            //Only set one blank type as feasible. 
-            //For the build direction, choose the shortest direction for forging, since the side cover will need to be the offset
-            //For plate, the build direction (used for making the .STL file) need not be along the shortest direction.
-            //Instead, plate and bar stock use the normal direction since they used a LFW or general machining in-plane offset.
-            switch (rectangularBlankType)
-            {
-                case BlankType.RectangularPlate:
-                    RectangularPlateIsFeasible = true;
-                    _rectangularPlateSize = rectangularPlateSize;
-                    break;
-
-                case BlankType.ForgedRectangularBar:
-                    ForgedRectangularBarIsFeasible = true;
-                    break;
-
-                case BlankType.RectangularBarStock:
-                    RectangularBarStockIsFeasible = true;
-                    _rectangularBarStockSize = rectangularBarStockSize;
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
+            RectangularBarStockIsFeasible = true;          
         }
 
         private Volume GetRectangularBlankVolume()
@@ -828,20 +673,16 @@ namespace KatanaObjects.BaseClasses
         /// <param name="width"></param>
         /// <param name="thickness"></param>
         /// <param name="distanceAlongNormal"></param>
-        /// <param name="chosenBlankType"></param>
         /// <param name="thicknessDirectionInt"></param>
-        /// <param name="barStockSize"></param>
         /// <param name="rectangularBlankPathAlongNormal"></param>
         /// <param name="rectangularBlankVertexPath"></param>
         /// <param name="isButtWeld"></param>
         /// <param name="lengthDirectionInt"></param>
         /// <param name="widthDirectionInt"></param>
-        /// <param name="plateSize"></param>
         /// //The build direction is strictly used to apply the offsets correctly when making the build path  
         public static void GetRectangularBlankDimensions(BoundingBox minimumBoundingBox, double[] normal,
             string solidUnitString, SearchInputs searchInputs, out Length length, out Length width, out Length thickness, out Length distanceAlongNormal,
-            out BlankType chosenBlankType, out int thicknessDirectionInt, out int lengthDirectionInt, out int widthDirectionInt,
-            out RectangularPlateSize plateSize, out RectangularBarStockSize barStockSize, 
+            out int thicknessDirectionInt, out int lengthDirectionInt, out int widthDirectionInt,
             out List<Point> rectangularBlankPathAlongNormal, out List<Vertex> rectangularBlankVertexPath, bool isButtWeld = false)
         {
             var boundingBoxDirections = minimumBoundingBox.Directions;
@@ -907,11 +748,6 @@ namespace KatanaObjects.BaseClasses
             ***********       Set the offsets used on the dimensions        ***********
             **************************************************************************/
             var standardMachiningOffset = searchInputs.General.StandardMachiningOffset;
-            var sawCutOffset = searchInputs.General.SawCutOffset;
-            if (isButtWeld)
-            {
-                //ToDo: burn-off will depend on the weld type
-            }
 
             /**************************************************************************
             ***********       Set the rectangular blank dimensions          ***********
@@ -923,71 +759,10 @@ namespace KatanaObjects.BaseClasses
             var medianDim = Length.FromTesselatedSolidBaseUnit(dimensions[middleDimensionIndex], solidUnitString);
             var minDim = Length.FromTesselatedSolidBaseUnit(smallestDimension, solidUnitString);
 
-            //TempThickness is the same as the Rectangular Plate and Rectangular Bar Stock T' thickness in the help images.
-            var tempThickness = minDim + 2 * standardMachiningOffset;
 
-            //Set defaults
-            thickness = Length.Zero;
-            plateSize = null;
-            barStockSize = null;
-            
-            //The thickness tolerance is used to allow a slightly smaller size, as may be needed if there are tesselation errors.
-            var thicknessTolerance = searchInputs.General.StockSizeTolerance;
-
-            //Choose which rectangular blank type to use based on thickness
-            if (tempThickness < (searchInputs.RectangularPlate.OrderedRectangularPlateSizes.Last().Thickness + thicknessTolerance))
-            {
-                //Set the length and width
-                length = maxDim + 2 * sawCutOffset;
-                width = medianDim + 2 * sawCutOffset;
-
-                //Set the thickness
-                //This is plate. Get the best fit size, which is the smallest thickness it will fit inside
-                //Keep the length and width as they are
-                foreach (var size in searchInputs.RectangularPlate.OrderedRectangularPlateSizes)
-                {
-                    if (tempThickness < size.Thickness + thicknessTolerance)
-                    {
-                        //The first time this happens will be on the smallest possible thickness, so we can exit.
-                        thickness = size.Thickness;
-                        plateSize = size;
-                        break;
-                    }
-                }
-                chosenBlankType = BlankType.RectangularPlate;
-            }
-            else if (tempThickness > (searchInputs.RectangularBarStock.OrderedRectangularBarStockSizes.Last().Thickness + thicknessTolerance))
-            {
-                //This is a forged rectangular stock
-                //Add the forging machining offset to all three dimensions
-                length = maxDim + 2 * searchInputs.ForgedRectangularBar.ForgedBarMachiningOffset;
-                width = medianDim + 2 * searchInputs.ForgedRectangularBar.ForgedBarMachiningOffset;
-                thickness = minDim + 2 * searchInputs.ForgedRectangularBar.ForgedBarMachiningOffset;
-
-                chosenBlankType = BlankType.ForgedRectangularBar;
-            }
-            else
-            {
-                //Set the length and width
-                length = maxDim + 2 * sawCutOffset;
-                width = medianDim + 2 * standardMachiningOffset;
-
-                //Set the thickness
-                //This is an extruded bar stock. Get the best fit size.
-                //This is bar stock. Get the best fit size, which is the smallest thickness it will fit inside
-                foreach (var size in searchInputs.RectangularBarStock.OrderedRectangularBarStockSizes)
-                {
-                    if (tempThickness < size.Thickness + thicknessTolerance)
-                    {
-                        //The first time this happens will be on the smallest possible thickness, so we can exit.
-                        thickness = size.Thickness;
-                        barStockSize = size;
-                        break;
-                    }
-                }
-
-                chosenBlankType = BlankType.RectangularBarStock;
-            }
+            length = maxDim + 2 * searchInputs.General.StandardMachiningOffset;
+            width = medianDim + 2 * searchInputs.General.StandardMachiningOffset;
+            thickness = minDim + 2 * searchInputs.General.StandardMachiningOffset;          
 
             if (thickness.Millimeters.IsNegligible()) throw new Exception("Rectangular Blank Thickness was not set properly.");
 
@@ -1854,38 +1629,16 @@ namespace KatanaObjects.BaseClasses
             if(waterjetShapePreTolerance == null || !waterjetShapePreTolerance.Any()) throw new Exception("Silhouette not found");
 
             var waterjetShape = GetWaterjetShapeGivenSilhouette(waterjetShapePreTolerance, _searchInputs, SolidUnitString);
-            bool waterjetPlateIsFeasible;
-            var plateSize = GetWaterjetPlateSize(waterjetDepthPreTolerance, _searchInputs, out waterjetPlateIsFeasible);
-            SetWaterjetShape(waterjetDirection, plateSize, waterjetShape, waterjetPlateIsFeasible);
-        }
-
-        public static WaterjetPlateSize GetWaterjetPlateSize(Length waterjetDepthPreTolerance, SearchInputs searchInputs,
-            out bool waterjetShapeIsFeasible)
-        {
-            waterjetShapeIsFeasible = false;//Default is false 
-
-            //Finish setting the waterjet depth
-            var waterjetDepth = waterjetDepthPreTolerance + searchInputs.General.StandardMachiningOffset * 2;
-
-            //The thickness tolerance is used to allow a slightly smaller size, as may be needed if there are tesselation errors.
-            var thicknessTolerance = searchInputs.General.StockSizeTolerance;
-
-            //Get the best fit size, which is the smallest thickness it will fit inside
-            foreach (var size in searchInputs.Waterjet.OrderedWaterjetPlateSizes.Where(size => waterjetDepth < size.Thickness + thicknessTolerance))
-            {
-                //The first time this happens will be on the smallest possible thickness, so we can exit.
-                waterjetDepth = size.Thickness;
-                waterjetShapeIsFeasible = true; 
-                return size;
-            }
-            return null;
+            var plateThickness = waterjetDepthPreTolerance + _searchInputs.General.StandardMachiningOffset * 2;
+            var waterjetPlateIsFeasible = plateThickness < Length.FromInches(4);
+            SetWaterjetShape(waterjetDirection, plateThickness, waterjetShape, waterjetPlateIsFeasible);
         }
 
         public static List<List<Point>> GetWaterjetShapeGivenSilhouette(List<List<Point>> waterjetShapePreTolerance, 
             SearchInputs searchInputs, string solidUnitString)
         {
             var tempShape = PolygonOperations.OffsetRound(waterjetShapePreTolerance,
-                        searchInputs.Waterjet.WaterjetCuttingOffset.TesselatedSolidBaseUnit(solidUnitString));
+                        searchInputs.Waterjet.CuttingOffset.TesselatedSolidBaseUnit(solidUnitString));
 
             //Apply mininum internal feature offset AFTER the cutting offset has been applied
             var waterjetShape = new List<List<Point>>();
@@ -1930,17 +1683,14 @@ namespace KatanaObjects.BaseClasses
             return waterjetShape;
         }
 
-        private void SetWaterjetShape(double[] waterjetDirection, WaterjetPlateSize waterjetPlateSize, 
+        private void SetWaterjetShape(double[] waterjetDirection, Length plateThickness, 
             List<List<Point>> waterjetShape, bool isFeasible)
         {
             _waterjetShapeHasBeenSet = true;
             _waterjetShapeIsFeasible = isFeasible;
             _waterjetDirection = waterjetDirection;
             _waterjetShape = waterjetShape;
-
-            if (!isFeasible) return;
-            _waterjetDepth = waterjetPlateSize.Thickness;
-            _waterjetPlateSize = waterjetPlateSize;
+            _waterjetDepth = plateThickness;
         }
 
         private Length GetWaterjetCuttingPerimeter()

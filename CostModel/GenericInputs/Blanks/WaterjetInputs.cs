@@ -27,6 +27,8 @@ namespace GenericInputs
         [DataMember]
         public Length ThicknessMachiningOffset { get; set; } = Length.FromMillimeters(1.0); //Guess
 
+        public Length MinInternalFeatureRadius { get; set; } = Length.FromInches(0.125); //Guess
+
 
         //Serialize the next few lists, since the constructor is not called during startup. Only if defaults are set.
         [Required]

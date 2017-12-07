@@ -52,7 +52,9 @@ namespace GenericInputs
         [Required]
         [Display(Name = "Standard Machining Offset")]
         [DataMember]
-        public Length MachiningOffset { get; set; } = Length.FromMillimeters(.1); //Value from Milling in http://www2.mae.ufl.edu/designlab/Lab%20Assignments/EML2322L-Tolerances.pdf
+        public Length StandardMachiningOffset { get; set; } = Length.FromMillimeters(.1); //Value from Milling in http://www2.mae.ufl.edu/designlab/Lab%20Assignments/EML2322L-Tolerances.pdf
 
+
+        public Length SawCutOffset { get; set; } = Length.FromInches(0.25); //Guess
     }
 }

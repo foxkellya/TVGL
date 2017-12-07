@@ -32,6 +32,8 @@ namespace GenericInputs
     [DataContract]
     public class HollowTubeInputs : Inputs
     {
+        public Length RadialOffset { get; set; } = Length.FromInches(0.125); //Guess
+
         [Required]
         [DataMember]
         [Display(Name = "Maximum Outer Diameter")]
