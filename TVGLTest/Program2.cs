@@ -8,6 +8,7 @@ using StarMathLib;
 using TVGL;
 using TVGL.Boolean_Operations;
 using TVGL.IOFunctions;
+using CostModelCalculator;
 
 namespace TVGL_Test
 {
@@ -77,6 +78,8 @@ namespace TVGL_Test
                 }
                 foreach (TessellatedSolid solid2 in negativeSolidsXslice1)
                 {
+                    GetCostModels.ForAllBlankTypes(solid2);
+
                     //conditional statement for second x cut
                     double X2 = Xmin + (k - 1) * dx;
                     List<TessellatedSolid> positiveSolidsXslice2 = new List<TessellatedSolid>();

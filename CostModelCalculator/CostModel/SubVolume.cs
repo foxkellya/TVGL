@@ -30,9 +30,6 @@ namespace KatanaObjects.BaseClasses
         [Description("Closed-Die Forging")]
         ClosedDieForging,
 
-        [Description("Wire Feedstock")] //NEED TO CHANGE VARIABLE NAMES - ONLY CHANGED TAGS
-        AdditiveFeedStock,
-
         [Description("Near-Net Additive")]
         NearNetAdditive,
 
@@ -506,7 +503,7 @@ namespace KatanaObjects.BaseClasses
 
         #region Constructor
         public SubVolume(TessellatedSolid solid, ISet<BlankType> blankTypes, 
-            SearchInputs searchInputs = null, List<List<Point>> machinedPartShapeOnPlane = null )
+            SearchInputs searchInputs)
         {
             //Initialize some public parameters
             AdditiveIsFeasible = true;
@@ -514,7 +511,6 @@ namespace KatanaObjects.BaseClasses
             ForgingIsFeasible = true;
             NearNetPrintedShapeIsFeasible = true;
 
-            MachinedPartShapeOnPlane = machinedPartShapeOnPlane;
             SolidUnitString = solid.Units.ToString();
             Solid = solid;
             SolidColor = solid.SolidColor;

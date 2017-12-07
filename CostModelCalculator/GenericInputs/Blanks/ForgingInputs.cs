@@ -69,5 +69,60 @@ namespace GenericInputs
         [DataMember]
         [Display(Name = "Die Cost Percentage [decimal percentage, e.g. 0.15)")]
         public Multiplier DieCostPercentage { get; set; } = Multiplier.FromUnitless(0.15); //Value is a guess
+
+
+        #region Cost Model Equation Parameters
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier1 Final Part Max Mass (Not Forged Mass)")]
+        public Mass FinishMassTier1Max { get; set; } = Mass.FromKilograms(10);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier2 Final Part Max Mass (Not Forged Mass)")]
+        public Mass FinishMassTier2Max { get; set; } = Mass.FromKilograms(50);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier1 Multiplier")]
+        public Multiplier Tier1Multiplier { get; set; } = Multiplier.FromUnitless(90);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier2 Multiplier")]
+        public Multiplier Tier2Multiplier { get; set; } = Multiplier.FromUnitless(60);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier3 Multiplier")]
+        public Multiplier Tier3Multiplier { get; set; } = Multiplier.FromUnitless(40);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier1 Price Per Mass Exponent Adjustment")]
+        public Multiplier ExponentTier1 { get; set; } = Multiplier.FromUnitless(.8);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier2 Price Per Mass Exponent Adjustment")]
+        public Multiplier ExponentTier2 { get; set; } = Multiplier.FromUnitless(.8);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Tier3 Price Per Mass Exponent Adjustment")]
+        public Multiplier ExponentTier3 { get; set; } = Multiplier.FromUnitless(.8);
+
+        #endregion
+
+        #region Custom Die Tooling Estimate Inputs
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Die Life Number Of Uses")]
+        public Multiplier DieLife { get; set; } = Multiplier.FromUnitless(1000);
+
+        #endregion
     }
+
 }

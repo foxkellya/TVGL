@@ -9,9 +9,9 @@ namespace GenericInputs
     {
         #region Material Density & Price
         [Required]
-        [Display(Name = "Titanium Density")]
+        [Display(Name = "Chosen Material Density")]
         [DataMember]
-        public Density TitaniumDensity { get; set; } = Density.FromKilogramsPerCubicMeter(4420); //Constant
+        public Density MaterialDensity { get; set; } = Density.FromKilogramsPerCubicMeter(4420); //Constant
 
         [Required]
         [Display(Name = "Steel Density")]
@@ -55,6 +55,10 @@ namespace GenericInputs
         public Length StandardMachiningOffset { get; set; } = Length.FromMillimeters(.1); //Value from Milling in http://www2.mae.ufl.edu/designlab/Lab%20Assignments/EML2322L-Tolerances.pdf
 
 
-        public Length SawCutOffset { get; set; } = Length.FromInches(0.25); //Guess
+        public Length SawCutOffset { get; set; } = Length.FromInches(0.25);
+
+        public CostPerDistance SawCostRate { get; set; } = CostPerDistance.FromDollarsPerInch(5); //Guess
+
+//Guess
     }
 }

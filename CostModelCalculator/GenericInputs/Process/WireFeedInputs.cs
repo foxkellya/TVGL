@@ -41,6 +41,12 @@ namespace GenericInputs
         [DataMember]
         public Ratio MachineAvailability { get; set; } = Ratio.FromPercent(80); //Guess
 
+        public Multiplier HoursPerDay { get; set; } = Multiplier.FromUnitless(16); //Guess
+        public Multiplier DaysPerWeek { get; set; } = Multiplier.FromUnitless(5); //Guess
+        public Multiplier GAOverhead { get; set; } = Multiplier.FromUnitless(0.1); //Guess 10%
+
+//Guess
+
         #endregion
     }
 }

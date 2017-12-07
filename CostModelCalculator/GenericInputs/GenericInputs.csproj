@@ -91,7 +91,7 @@
       <Name>TessellationAndVoxelizationGeometryLibraryUniversal</Name>
     </ProjectReference>
     <ProjectReference Include="..\UnitsNet\UnitsNet\UnitsNet.Portable40.csproj">
-      <Project>{52C647A6-A05A-4CBD-A18A-9F1D260800F8}</Project>
+      <Project>{52c647a6-a05a-4cbd-a18a-9f1d260800f8}</Project>
       <Name>UnitsNet.Portable40</Name>
     </ProjectReference>
   </ItemGroup>

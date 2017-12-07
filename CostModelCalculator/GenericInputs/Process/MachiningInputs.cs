@@ -26,10 +26,10 @@ namespace GenericInputs
         [DataMember]
         public Length RoughingAmountToLeave { get; set; } = Length.FromInches(1); //Guess
 
-        //[Required]
-        //[Display(Name = "Shop Cost Rate")]
-        //[DataMember]
-        //public CostRate ShopCostRate { get; set; } = CostRate.FromDollarsPerHour(156); //[dollars/hour]
+        [Required]
+        [Display(Name = "Shop Cost Rate")]
+        [DataMember]
+        public CostRate ShopCostRate { get; set; } = CostRate.FromDollarsPerHour(156); //[dollars/hour]
 
         [Required]
         [Display(Name = "Titanium Chip Reclaim Value")]
@@ -83,7 +83,14 @@ namespace GenericInputs
         [Required]
         [Display(Name = "Consumables Rate")]
         [DataMember]
-        public Multiplier ConsumablesRate { get; set; } = Multiplier.FromUnitless(0.15); //Guess
+        public Multiplier ConsumablesRate { get; set; } = Multiplier.FromUnitless(0.15);
+
+        [Required]
+        [DataMember]
+        [Display(Name = "Die Steel Machining MRR")]
+        [Source("More conservative value from http://todaysmachiningworld.com/magazine/how-it-works-rapid-material-removal/ for a similar material")]
+        public MaterialRemovalRate DieSteelMachiningMRR { get; set; } = MaterialRemovalRate.FromCubicInchesPerMinute(25);
+
         #endregion
     }
 }
