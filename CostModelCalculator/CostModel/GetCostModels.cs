@@ -22,7 +22,7 @@ namespace CostModelCalculator
 
         }
 
-        public static void ForAllBlankTypes(TessellatedSolid ts)
+        public static double ForAllBlankTypes(TessellatedSolid ts)
         {
             ts.Units = UnitType.millimeter; //Guess
 
@@ -38,7 +38,7 @@ namespace CostModelCalculator
             var subvolume = new SubVolume(ts, blankTypes, searchInputs);
 
             //ToDo: Add other blank types.
-            Debug.Print(GetCostOfRectangularBarStock(subvolume, costFactory).Dollars.ToString(CultureInfo.InvariantCulture));
+            return GetCostOfRectangularBarStock(subvolume, costFactory).Dollars;
         }
 
         private static Cost GetCostOfRectangularBarStock(SubVolume subVolume, ICostModelFactory costFactory)
