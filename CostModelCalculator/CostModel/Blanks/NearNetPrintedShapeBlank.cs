@@ -14,6 +14,7 @@ namespace KatanaObjects.Blanks
     {
         internal NearNetPrintedShapeBlank(SubVolume subVolume, SearchInputs inputs) : base(subVolume)
         {
+            if (!subVolume.AdditiveIsFeasible) return;
             var direction = subVolume.AdditiveBuildDirection;
             //Get the substrate plate.
             var crossSection = subVolume.AdditiveCrossSections.Last();

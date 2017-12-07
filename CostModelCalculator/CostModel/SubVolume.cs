@@ -32,10 +32,6 @@ namespace KatanaObjects.BaseClasses
 
         [Description("Near-Net Additive")]
         NearNetAdditive,
-
-        //Assembly Blank Type. Not included in User Interface or the search process.
-        [Description("Assembly")]
-        Assembly
     }
 
     public class SubVolume
@@ -738,8 +734,6 @@ namespace KatanaObjects.BaseClasses
             }
             if (indexOfNormalDirection == -1) throw new Exception("One of the given directions must align with the normal");
 
-
-
             /**************************************************************************
             ***********       Set the offsets used on the dimensions        ***********
             **************************************************************************/
@@ -755,10 +749,9 @@ namespace KatanaObjects.BaseClasses
             var medianDim = Length.FromTesselatedSolidBaseUnit(dimensions[middleDimensionIndex], solidUnitString);
             var minDim = Length.FromTesselatedSolidBaseUnit(smallestDimension, solidUnitString);
 
-
-            length = maxDim + 2 * searchInputs.General.StandardMachiningOffset;
-            width = medianDim + 2 * searchInputs.General.StandardMachiningOffset;
-            thickness = minDim + 2 * searchInputs.General.StandardMachiningOffset;          
+            length = maxDim + 2* standardMachiningOffset;
+            width = medianDim + 2 * standardMachiningOffset;
+            thickness = minDim + 2 * standardMachiningOffset;          
 
             if (thickness.Millimeters.IsNegligible()) throw new Exception("Rectangular Blank Thickness was not set properly.");
 
@@ -818,14 +811,6 @@ namespace KatanaObjects.BaseClasses
                 offsetDirection2 = thicknessDirection;
                 area2 = (length * thickness).TesselatedSolidBaseUnit(solidUnitString);
             }
-
-            //2) Get the rectangular blank path with the given dimensions are directions
-            //rectangularBlankPath =
-            //    CreateRectangularSolidPath(rectangularBlankBuildDirection,
-            //        minimumBoundingBox, projectionTolerance,
-            //        offsetDimension1.TesselatedSolidBaseUnit(solidUnitString),
-            //        offsetDirection1,
-            //        offsetDimension2.TesselatedSolidBaseUnit(solidUnitString), offsetDirection2);
 
             //2) Get the rectangular blank path with the given dimensions and directions
             rectangularBlankPathAlongNormal = CreateRectangularSolidPathAlongSearchDirection(normal, minimumBoundingBox, 
@@ -1777,31 +1762,14 @@ namespace KatanaObjects.BaseClasses
         private Volume GetAdditiveVolume()
         {
             var directions = new List<double[]>();
-            if (Flat != null)
-            {
-                //NOT reverse of plane normal. 
-                //Rather, it must be the direction toward the plane.
-                List<Vertex> bottomVertices, topVertices;
-                MinimumEnclosure.GetLengthAndExtremeVertices(Flat.Normal, Solid.Vertices,
-                    out bottomVertices, out topVertices);
-                var furthestForward = topVertices[0].Position.dotProduct(Flat.Normal) - Flat.DistanceToOrigin;
-                var furthestReverse = bottomVertices[0].Position.dotProduct(Flat.Normal) - Flat.DistanceToOrigin;
-                directions.Add(Math.Abs(furthestForward) > Math.Abs(furthestReverse)
-                    ? Flat.Normal.multiply(-1)
-                    : Flat.Normal);
-            }              
-            else
-            {
-                //ToDo: In fact, the best direction could be any of the six primary or other directions
-                //The normal had not been defined. Get the volume along the smallest OBB direciton
-                //Also try the reverse direction.
-                var buildDirection = OBBSmallestNormal;
-                directions.Add(buildDirection); 
-                directions.Add(buildDirection.multiply(-1));
-            } 
-            
-            //No need it taking a step size smaller than the wire feed accuracy
-            //var stepSize = _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString);
+
+            //ToDo: In fact, the best direction could be any of the six primary or other directions
+            //The normal had not been defined. Get the volume along the smallest OBB direciton
+            //Also try the reverse direction.
+            var buildDirection = OBBSmallestNormal;
+            directions.Add(buildDirection); 
+            directions.Add(buildDirection.multiply(-1));
+                     
             var minAdditiveVolume = double.MaxValue;
             var additiveOutputData = new List<DirectionalDecomposition.DecompositionData>();
 
@@ -1810,7 +1778,9 @@ namespace KatanaObjects.BaseClasses
                 List<Vertex> bottomVertices, topVertices;
                 var length = MinimumEnclosure.GetLengthAndExtremeVertices(direction, Solid.Vertices,
                     out bottomVertices, out topVertices);
-                var stepSize = length / _searchInputs.WireFeedstock.NumberOfSlices.Unitless;
+                //var stepSize = length / _searchInputs.WireFeedstock.NumberOfSlices.Unitless;
+                //No need it taking a step size smaller than the wire feed accuracy
+                var stepSize = _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString);
                 if (length < 2 * stepSize)
                 {
                     AdditiveIsFeasible = false;

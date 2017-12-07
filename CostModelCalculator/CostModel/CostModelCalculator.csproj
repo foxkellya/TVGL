@@ -74,7 +74,6 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Blanks\AssemblyBlank.cs" />
     <Compile Include="Blanks\Blank.cs" />
     <Compile Include="Blanks\CircularBarStockBlank.cs" />
     <Compile Include="Blanks\ExtrusionBlank.cs" />

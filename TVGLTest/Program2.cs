@@ -9,6 +9,7 @@ using TVGL;
 using TVGL.Boolean_Operations;
 using TVGL.IOFunctions;
 using CostModelCalculator;
+using KatanaObjects.BaseClasses;
 
 namespace TVGL_Test
 {
@@ -78,7 +79,7 @@ namespace TVGL_Test
                 }
                 foreach (TessellatedSolid solid2 in negativeSolidsXslice1)
                 {
-                    GetCostModels.ForAllBlankTypes(solid2);
+                    GetCostModels.ForGivenBlankType(solid2, BlankType.RectangularBarStock);
 
                     //conditional statement for second x cut
                     double X2 = Xmin + (k - 1) * dx;

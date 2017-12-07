@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using GenericInputs;
 using KatanaObjects.BaseClasses;
 using KatanaObjects.CostModels;
 using KatanaObjects.Processes;
@@ -64,9 +62,6 @@ namespace KatanaObjects.Blanks
 
         //Cross sections are not saved because they take too much memory. //These cross sections avoid the need to re-find the forging/additive visual approximations when loading
         public List<List<List<double[]>>> CrossSections { get; set; }
-
-        //Does not need to be a data member, since this variable does not store information.
-        public bool IsAssembly => Type == BlankType.Assembly;
 
         [DataMember]
         public Volume StockVolume { get; set; }
@@ -173,7 +168,6 @@ namespace KatanaObjects.Blanks
             if (blank == null || !blank.IsFeasible) return blank;
             //blank.CostModel = costFactory.PostJoiningCostModel(blank);
             blank.MaterialCostModel = costFactory.MaterialCostModel(blank);
-            if (blank.Type == BlankType.Assembly) throw new Exception("not considered");
 
             //Get the machining cost model estimate
             var machiningEstimate = Machining.Create(costFactory, blank.FinishVolume, blank.SubVolume.SurfaceArea, blank.StockVolume, false);
@@ -184,7 +178,7 @@ namespace KatanaObjects.Blanks
 
         public void SetCostModels(ICostModelFactory costFactory)
         {
-            if (Type == BlankType.Assembly || !IsFeasible) return;
+            if (!IsFeasible) return;
             //CostModel = costFactory.PostJoiningCostModel(this);
             MaterialCostModel = costFactory.MaterialCostModel(this);
             
@@ -222,15 +216,11 @@ namespace KatanaObjects.Blanks
                 case BlankType.HollowTube:
                     CrossSections = SubVolume.HollowTubeCrossSections;
                     break;
-
-                case BlankType.Assembly:
-                    break;
             }
         }
 
         public TessellatedSolid GetStockMaterialSolid()
         {
-            if (Type == BlankType.Assembly) return null;
             if (CrossSections == null)
             {
                 SetCrossSections();
