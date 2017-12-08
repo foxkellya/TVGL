@@ -1,0 +1,19 @@
+﻿{
+  "Name": "Multiplier",
+  "BaseUnit": "Unitless",
+  "XmlDoc": "A class for unitless multipliers. Still better to know it is unitless than using a double.",
+  "Units": [
+    {
+      "SingularName": "Unitless",
+      "PluralName": "Unitless",
+      "FromUnitToBaseFunc": "x",
+      "FromBaseToUnitFunc": "x",
+      "Localization": [
+        {
+          "Culture": "en-US",
+          "Abbreviations": [ "" ]
+        }
+      ]
+    }
+  ]
+}

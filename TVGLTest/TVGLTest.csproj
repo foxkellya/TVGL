@@ -65,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExcelInterface.cs" />
-    <Compile Include="Programuniformslice.cs" />
+    <Compile Include="Program2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +94,10 @@
     <Content Include="StarMath.XML" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CostModelCalculator\CostModel\CostModelCalculator.csproj">
+      <Project>{1ce6652e-e569-48a9-b7a9-175c8b1bca87}</Project>
+      <Name>CostModelCalculator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TVGLPresenterDebugger\TVGLPresenterDebugger.csproj">
       <Project>{f6678d6c-1f71-4f4e-ac77-22f5e133a6f2}</Project>
       <Name>TVGLPresenterDebugger</Name>

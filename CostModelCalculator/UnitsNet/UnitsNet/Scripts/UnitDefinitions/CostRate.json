@@ -1,0 +1,67 @@
+﻿{
+    "Name": "CostRate",
+    "BaseUnit": "DollarPerSecond",
+    "XmlDoc": "The cost of something per unit a unit of time.",
+    "Units": [
+        {
+        "SingularName": "DollarPerSecond",
+        "PluralName": "DollarsPerSecond",
+        "FromUnitToBaseFunc": "x",
+        "FromBaseToUnitFunc": "x",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/s", "dollar/s", "dollars/s" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerMinute",
+        "PluralName": "DollarsPerMinute",
+        "FromUnitToBaseFunc": "x*60",
+        "FromBaseToUnitFunc": "x/60",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/min", "dollar/min", "dollars/min"  ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerHour",
+        "PluralName": "DollarsPerHour",
+        "FromUnitToBaseFunc": "x*3600",
+        "FromBaseToUnitFunc": "x/3600",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/hr", "dollar/hr", "dollars/hr" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerDay",
+        "PluralName": "DollarsPerDay",
+        "FromUnitToBaseFunc": "x*3600*24",
+        "FromBaseToUnitFunc": "x/(3600*24)",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/day", "dollar/day", "dollars/day" ]
+          }
+        ]
+      },   
+      {
+        "SingularName": "DollarPerYear",
+        "PluralName": "DollarsPerYear",
+        "FromUnitToBaseFunc": "x*3600*24*365",
+        "FromBaseToUnitFunc": "x/(3600*24*365)",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/yr", "dollar/yr", "dollars/yr" ]
+          }
+        ]
+      }   
+    ]
+}

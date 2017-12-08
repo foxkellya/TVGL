@@ -1,0 +1,120 @@
+﻿using BlankFactory.Inputs;
+using System;
+using System.ComponentModel.DataAnnotations;
+using BlankFactory.Blanks;
+using UnitsNet;
+
+namespace BlankFactory.CostModels
+{
+    //Forging model was aquired by OSU from Kevin Slattery at Boeing.
+    //Model was created for inputs as lbs and outputs a USD/lbs rate
+    //Tiers based on finish mass
+
+    public class ForgingCostModel : ICostModel
+    {
+        private readonly SearchInputs _inputs;
+
+        public ForgingCostModel(SearchInputs inputs, Blank blank)
+        {
+            _inputs = inputs;
+            FinishVolume = blank.FinishVolume;
+            ForgingVolume = blank.StockVolume;
+        }
+
+        #region Geometries
+
+        [Display(Name = "Finish Volume")]
+        [Equation("Geometry From TVGL")]
+        [Source("")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.Geometric)]
+        public Volume FinishVolume { get; }
+
+        [Display(Name = "Finish Mass")]
+        [Equation("Finish Volume * Material Density")]
+        [Source("")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.Geometric)]
+        public Mass FinishMass => Mass.FromKilograms(FinishVolume.CubicMillimeters * _inputs.General.MaterialDensity.KilogramsPerCubicMillimeter);
+
+        [Display(Name = "Forging Volume")]
+        [Equation("Geometry From TVGL")]
+        [Source("")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.Geometric)]
+        public Volume ForgingVolume { get; }
+
+        [Display(Name = "Forging Mass")]
+        [Equation("Forging Volume * Material Density")]
+        [Source("")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.Geometric)]
+        public Mass ForgingMass => Mass.FromKilograms(ForgingVolume.CubicMillimeters * _inputs.General.MaterialDensity.KilogramsPerCubicMillimeter);
+
+        #endregion
+
+        #region Parameters for Forging Model & Cost Calculation of Forging
+
+        [Display(Name = "Cost Multiplier")]
+        [Equation("")]
+        [Source("Kevin Slattery (Boeing)")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.UserInput)]
+        public Multiplier CostMultiplier
+             =>
+                FinishMass <= _inputs.Forging.FinishMassTier1Max
+                    ? _inputs.Forging.Tier1Multiplier
+                    : (FinishMass <= _inputs.Forging.FinishMassTier2Max
+            ? _inputs.Forging.Tier2Multiplier : _inputs.Forging.Tier3Multiplier);
+
+        [Display(Name = "Cost Exponent")]
+        [Equation("")]
+        [Source("Kevin Slattery (Boeing)")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.UserInput)]
+        public Multiplier CostExponent
+            =>
+                FinishMass <= _inputs.Forging.FinishMassTier1Max
+                    ? _inputs.Forging.ExponentTier1
+                    : (FinishMass <= _inputs.Forging.FinishMassTier2Max 
+            ? _inputs.Forging.ExponentTier2 : _inputs.Forging.ExponentTier3);
+
+        [Display(Name = "Forging Cost")]
+        [Equation("Cost Multiplier * (Forging Mass [lbs] ^ Cost Exponent)")]
+        [Source("Kevin Slattery (Boeing)")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.CalculatedCost)]
+        public Cost ForgingCost => CalculateForgingCost(CostMultiplier, CostExponent);
+
+        #endregion
+
+        #region Custom Forging Die Cost
+
+        [Display(Name = "Custom Forging Die Cost")]
+        [Equation("3 * Forging Volume")]
+        [Source("Boeing Discussion in Bi-Weekly Review")]
+        public Volume DieVolume => ForgingVolume * 3;
+
+        public Cost DieCost =>  Cost.FromDollars(DieVolume.CubicCentimeters * _inputs.General.SteelDensity.KilogramsPerCubicCentimeter * _inputs.General.SteelPrice.DollarsPerKilogram);
+
+        public Multiplier DieLife => ;
+
+        public Cost AmortizedDieCost => DieCost / DieLife;
+
+        #endregion
+
+        [Display(Name = "Total Cost")]
+        [Equation("Forging Cost")]
+        [Source("")]
+        [Notes("")]
+        [OutputUnitType(KatanaUnitType.TotalCost)]
+        public Cost TotalCost => ForgingCost + AmortizedDieCost;
+
+        //[dollars = kg * (dollars/kg)]
+        private Cost CalculateForgingCost(Multiplier multiplier, Multiplier exponent)
+        {
+            //forgingMass in [lb] from TVGL estimate
+            return Cost.FromDollars(multiplier.Value * Math.Pow(ForgingMass.Pounds, exponent.Value));
+        }
+    }
+}

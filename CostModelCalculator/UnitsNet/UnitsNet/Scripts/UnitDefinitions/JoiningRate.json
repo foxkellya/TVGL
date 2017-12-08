@@ -1,0 +1,104 @@
+﻿{
+    "Name": "JoiningRate",
+    "BaseUnit": "SquareMeterPerSecond",
+    "XmlDoc": "Speed of a joining operation, used for linear and rotary friction welding",
+    "Units": [
+      {
+        "SingularName": "SquareMeterPerSecond",
+        "PluralName": "SquareMetersPerSecond",
+        "FromUnitToBaseFunc": "x",
+        "FromBaseToUnitFunc": "x",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "m²/s" ]
+          }
+        ]
+      },
+            {
+        "SingularName": "SquareMeterPerMinute",
+        "PluralName": "SquareMetersPerMinute",
+        "FromUnitToBaseFunc": "x/60",
+        "FromBaseToUnitFunc": "x*60",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "m²/min" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareCentimeterPerSecond",
+        "PluralName": "SquareCentimetersPerSecond",
+        "FromUnitToBaseFunc": "x*1e-4",
+        "FromBaseToUnitFunc": "x*1e+4",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "cm²/s" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareCentimeterPerMinute",
+        "PluralName": "SquareCentimetersPerMinute",
+        "FromUnitToBaseFunc": "x*6e-5",
+        "FromBaseToUnitFunc": "x*6e+5",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "cm²/min" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareMillimeterPerSecond",
+        "PluralName": "SquareMillimetersPerSecond",
+        "FromUnitToBaseFunc": "x*1e-6",
+        "FromBaseToUnitFunc": "x*1e+6",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "cm²/s" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareMillimeterPerMinute",
+        "PluralName": "SquareMillimetersPerMinute",
+        "FromUnitToBaseFunc": "x*6e-7",
+        "FromBaseToUnitFunc": "x*6e+7",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "mm²/min" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareInchPerSecond",
+        "PluralName": "SquareInchesPerSecond",
+        "FromUnitToBaseFunc": "x/1550",
+        "FromBaseToUnitFunc": "x*1550",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "in²/s" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "SquareInchPerMinute",
+        "PluralName": "SquareInchesPerMinute",
+        "FromUnitToBaseFunc": "x/93000.2",
+        "FromBaseToUnitFunc": "x*93000.2",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "in²/min" ]
+          }
+        ]
+      }
+
+    ]
+}
