@@ -25,8 +25,8 @@ namespace TVGL_Test
 
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/ABF.stl";
-            //var filename = "../../../TestFiles/sth2.stl";
-            var filename = "../../../TestFiles/casing.stl";
+            var filename = "../../../TestFiles/sth2.stl";
+            //var filename = "../../../TestFiles/casing.stl";
 
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
@@ -58,7 +58,7 @@ namespace TVGL_Test
                 {
                     //returns entire solid at xmax
                     negativeSolidsXslice1.Add(solid1);
-                    Console.WriteLine("Display negative solids after XMAX");
+                    //Console.WriteLine("Display negative solids after XMAX");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
                 }
                 else if (X1>Xmax)
@@ -74,7 +74,7 @@ namespace TVGL_Test
                     { 1.0,0,0 }),
                     out positiveSolids,
                     out negativeSolidsXslice1);
-                    Console.WriteLine("Display negative solids after X1 slice");
+                    //Console.WriteLine("Display negative solids after X1 slice");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
                 }
                 foreach (TessellatedSolid solid2 in negativeSolidsXslice1)
@@ -88,14 +88,14 @@ namespace TVGL_Test
                     if(Math.Abs(X2 - Xmin) < .000000001)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        Console.WriteLine("Display negative solids after XMIN");
+                        //Console.WriteLine("Display negative solids after XMIN");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
                     //returns solid with second cut at xmin
                     else if (X2 < solid2.XMin)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
+                        //Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
                     //returns positive solids after second x cut
