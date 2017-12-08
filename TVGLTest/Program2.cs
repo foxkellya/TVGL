@@ -23,8 +23,8 @@ namespace TVGL_Test
 
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/ABF.stl";
-            var filename = "../../../TestFiles/sth2.stl";
-            //var filename = "../../../TestFiles/casing.stl";
+            //var filename = "../../../TestFiles/sth2.stl";
+            var filename = "../../../TestFiles/casing.stl";
 
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
@@ -37,7 +37,7 @@ namespace TVGL_Test
             var solid1 = solids[0];
             double[,] backTransform;
             solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-            //Presenter.ShowAndHang(solids[0]);
+            Presenter.ShowAndHang(solids[0]);
 
             
             
@@ -45,14 +45,14 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = 10; //uniform length of square
+            var dx = 1; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
-            for (var k = 1; k <= nxslices; k++)
+            for (var k = 0; k <= nxslices; k++)
             {
                 //create x location of slice
-                double X1 = Xmin + k * dx;
+                double X1 = Xmin + (k+1) * dx;
                 //conditional statement for first x cut
                 List<TessellatedSolid> negativeSolidsXslice1 = new List<TessellatedSolid>();
                 if (k==nxslices)
@@ -66,8 +66,8 @@ namespace TVGL_Test
                 {
                     //returns entire solid at xmax
                     negativeSolidsXslice1.Add(solid1);
-                    //Console.WriteLine("Display negative solids at XMAX");
-                    //Presenter.ShowAndHang(negativeSolidsXslice1);
+                    Console.WriteLine("Display negative solids at XMAX");
+                   //Presenter.ShowAndHang(negativeSolidsXslice1);
 
                 }
 
@@ -79,26 +79,26 @@ namespace TVGL_Test
                     { 1.0,0,0 }),
                     out List<TessellatedSolid> positiveSolids,
                     out negativeSolidsXslice1);
-                    //Console.WriteLine("Display negative solids after X1 slice");
+                    Console.WriteLine("Display negative solids after X1 slice");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
                 }
                 foreach (TessellatedSolid solid2 in negativeSolidsXslice1)
                 {
                     //conditional statement for second x cut
-                    double X2 = Xmin + (k - 1) * dx;
+                    double X2 = Xmin + k * dx;
                     List<TessellatedSolid> positiveSolidsXslice2 = new List<TessellatedSolid>();
                     //returns solid without second cut at xmin
-                    if(k==1)
+                    if(k==0)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        //Console.WriteLine("Display negative solids after XMIN");
+                        Console.WriteLine("Display negative solids after XMIN");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
                     //returns solid with second cut at xmin
                     else if (X2 < solid2.XMin)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        //Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
+                       Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
                     //returns positive solids after second x cut
@@ -122,15 +122,15 @@ namespace TVGL_Test
                         var Ymaxsm = smsolid.YMax;
                         var Yminsm = smsolid.YMin;
                         //cutting uniform solids
-                        var dy = 10; //uniform length of square
+                        var dy = 1; //uniform length of square
                         var nydec = (Ymaxsm - Yminsm) / dy;
                         var nyslices = Math.Floor(nydec);
 
 
-                        for (var m = 1; m <= nyslices; m++)
+                        for (var m = 0; m <= nyslices; m++)
                         {
                             //create location of first y cut
-                            double Y1 = Yminsm + m * dy;
+                            double Y1 = Yminsm + (m+1) * dy;
                             //conditional statement for first y cut
                             List<TessellatedSolid> negativeSolidsYslice1 = new List<TessellatedSolid>();
                             if(m==nyslices)
@@ -154,14 +154,14 @@ namespace TVGL_Test
                             foreach (TessellatedSolid smsolid2 in negativeSolidsYslice1)
                             {
                                 //conditional statement for second y cut
-                                double Y2 = Yminsm + (m - 1) * dy;
+                                double Y2 = Yminsm + m * dy;
                                 List<TessellatedSolid> positiveSolidsYslice2 = new List<TessellatedSolid>();
-                                if (m==1) 
+                                if (m==0) 
                                 {
                                     //returns entire solid with second cut at ymin
                                     positiveSolidsYslice2.Add(smsolid2);
                                     Console.WriteLine("Display negative solids after YMIN");
-                                   // Presenter.ShowAndHang(positiveSolidsYslice2);
+                                   //Presenter.ShowAndHang(positiveSolidsYslice2);
                                 }
                                 else if (Y2 < smsolid2.YMin)
                                 {
@@ -189,25 +189,35 @@ namespace TVGL_Test
                                     var Zmaxxsm = xsmsolid.ZMax;
                                     var Zminxsm = xsmsolid.ZMin;
                                     //cutting uniform solids
-                                    var dz = 10; //uniform length of square
+                                    var dz = 1; //uniform length of square
                                     var nzdec = (Zmaxxsm - Zminxsm) / dz;
                                     var nzslices = Math.Floor(nzdec);
-
-                                    for (var n = 1; n <= nzslices; n++)
+                                    Console.WriteLine("nzslices={0}", nzslices);
+                                    
+                             
+                                        for (var n = 0; n <= nzslices; n++)
                                     {
                                         //create z location of slice
-                                        double Z1 = Zminxsm + n * dz;
+                                        double Z1 = Zminxsm + (n+1) * dz;
                                         List<TessellatedSolid> negativeSolidsZslice1 = new List<TessellatedSolid>();
                                         //conditional statement at first z cut
-                                        if (n == nzslices)
-                                        {
-                                            //returns entire solid due to being greater than Zmax
-                                            negativeSolidsZslice1.Add(xsmsolid);
-                                            Console.WriteLine("Display negative solids greater ZMAX");
-                                            //Presenter.ShowAndHang(negativeSolidsZslice1);
+                                        //if (n>=nzslices)
+                                        //{
+                                        //    //returns entire solid due to being greater than Zmax
+                                        //    negativeSolidsZslice1.Add(xsmsolid);
+                                        //    Console.WriteLine("Display negative solids greater ZMAX");
+                                        //    //Presenter.ShowAndHang(negativeSolidsZslice1);
 
-                                        }
+                                        //}
+                                        //if (Z1>=Zmaxxsm)
+                                        //    {
+                                        //        //returns entire solid due to being greater than Zmax
+                                        //        negativeSolidsZslice1.Add(xsmsolid);
+                                        //        Console.WriteLine("Display negative solids greater ZMAX");
+                                        //        //Presenter.ShowAndHang(negativeSolidsZslice1);
 
+                                        //    }
+                                      
                                         else
                                         {
                                             //returns negatives solids after first z cut
@@ -222,9 +232,9 @@ namespace TVGL_Test
                                         foreach (TessellatedSolid xsmallsolid2 in negativeSolidsZslice1)
                                         {
                                             //conditional statement for second z cut
-                                            double Z2 = Zminxsm + (n - 1) * dz;
+                                            double Z2 = Zminxsm + n * dz;
                                             List<TessellatedSolid> positiveSolidsZslice2 = new List<TessellatedSolid>();
-                                            if (n==1)
+                                            if (n==0)
                                                 {
                                                 //returns entire solid with second cut at zmin
                                                 positiveSolidsZslice2.Add(xsmallsolid2);
@@ -238,6 +248,7 @@ namespace TVGL_Test
                                                Console.WriteLine("Display negative solids after ZMIN of new solid<second z slice");
                                                //Presenter.ShowAndHang(positiveSolidsZslice2);
                                             }
+                                           
 
                                             else
                                             {
@@ -254,8 +265,9 @@ namespace TVGL_Test
                                             {
                                                 //save solids to a list
                                                 volumeslist.Add(finalsolid);
+
                                                 Console.WriteLine("Display positive solids FINAL");
-                                                //Presenter.ShowAndHang(positiveSolidsZslice2);
+                                                //Presenter.ShowAndHang(volumeslist);
                                             }
 
                                         }
