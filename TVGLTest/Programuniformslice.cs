@@ -8,6 +8,8 @@ using StarMathLib;
 using TVGL;
 using TVGL.Boolean_Operations;
 using TVGL.IOFunctions;
+using CostModelCalculator;
+using KatanaObjects.BaseClasses;
 
 namespace TVGL_Test
 {

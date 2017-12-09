@@ -65,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExcelInterface.cs" />
-    <Compile Include="Programuniformslice.cs" />
+    <Compile Include="ProgramCost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
