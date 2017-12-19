@@ -198,7 +198,7 @@ namespace TVGL_Test
                                     var Zmaxxsm = xsmsolid.ZMax;
                                     var Zminxsm = xsmsolid.ZMin;
                                     //cutting uniform solids
-                                    var dz = 10; //uniform length of square
+                                    var dz = 1; //uniform length of square
                                     var nzdec = (Zmaxxsm - Zminxsm) / dz;
                                     var nzslices = Math.Ceiling(nzdec);
                                     Console.WriteLine("nzslices={0}", nzslices);
