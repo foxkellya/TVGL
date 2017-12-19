@@ -43,7 +43,7 @@ namespace TVGL_Test
             solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
             //Presenter.ShowAndHang(solids[0]);
 
-            List<double> deltClist = new List<double>();
+            List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
             var values = new List<double[]>();
 
@@ -51,7 +51,7 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = .1; //uniform length of square
+            var dx = 1; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
@@ -63,6 +63,9 @@ namespace TVGL_Test
                 List<TessellatedSolid> negativeSolidsXslice1 = new List<TessellatedSolid>();
                 List<double> C1tot = new List<double>();
                 List<double> C2tot = new List<double>();
+                List<double> V1tot = new List<double>();
+                List<double> V2tot = new List<double>();
+
                 if (k == 0)
                 {
                     //returns entire solid at xmax
@@ -70,7 +73,7 @@ namespace TVGL_Test
                     Console.WriteLine("Display all negative solids at X1 slice at xmax");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
                 }
-                else if(Math.Abs(X1-Xmin)<.0001)
+                else if(Math.Abs(X1-Xmin)<.001)
                 {
                     //do nothing
                     
@@ -96,6 +99,9 @@ namespace TVGL_Test
                     double C1= GetCostModels.ForGivenBlankType(solid2, BlankType.RectangularBarStock);
                     Console.WriteLine("Above is the cost of the solid after 1st cut");
                     C1tot.Add(C1);
+                    V1tot.Add(solid2.Volume);
+                    //Presenter.ShowAndHang(solid2);
+
 
                     //conditional statement for second x cut
                     double X2 = Xmax - (k+1) * dx;
@@ -107,7 +113,7 @@ namespace TVGL_Test
                         positiveSolidsXslice2.Add(solid2);
                         negativeSolidsXslice2.Add(solid2);
                         Console.WriteLine("Display original negative solid from X1 at xmin");
-                        Presenter.ShowAndHang(positiveSolidsXslice2);
+                        //Presenter.ShowAndHang(negativeSolidsXslice2);
                     }
                     //returns solid with second cut at xmin
                     else if (X2 < solid2.XMin)
@@ -122,7 +128,7 @@ namespace TVGL_Test
                         positiveSolidsXslice2.Add(solid2);
                         negativeSolidsXslice2.Add(solid2);
                         Console.WriteLine("Display original negative solid from X1 when last slice is very small");
-                        Presenter.ShowAndHang(positiveSolidsXslice2);
+                        //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
 
                     //returns positive solids after second x cut
@@ -133,16 +139,18 @@ namespace TVGL_Test
                         { 1.0,0,0}),
                         out positiveSolidsXslice2,
                         out negativeSolidsXslice2);
-                        Console.WriteLine("Display positive solids after another X2slice");
+                        Console.WriteLine("Display negative solids after another X2slice");
                     }
-                        //Presenter.ShowAndHang(positiveSolidsXslice2);
+                        //Presenter.ShowAndHang(negativeSolidsXslice2);
                         foreach (TessellatedSolid costsolid in negativeSolidsXslice2)
                         {
                             double C2 = GetCostModels.ForGivenBlankType(costsolid, BlankType.RectangularBarStock);
                             Console.WriteLine("Above is the cost of the solid after 2nd cut");
                             C2tot.Add(C2);
-                        }
-                        foreach (TessellatedSolid finalsolid in positiveSolidsXslice2)
+                            V2tot.Add(costsolid.Volume);
+                        //Presenter.ShowAndHang(costsolid);
+                    }
+                    foreach (TessellatedSolid finalsolid in positiveSolidsXslice2)
                         {
 
                             //Presenter.ShowAndHang(finalsolid);
@@ -152,15 +160,17 @@ namespace TVGL_Test
                             Console.WriteLine("Display positive solids FINAL");
                             //Presenter.ShowAndHang(volumeslist);
                         }
-                        double deltC = C1tot.Sum() - C2tot.Sum();
+                    double deltV = V1tot.Sum() - V2tot.Sum();
+                    if (deltV<0)
+                        {
+                        Console.WriteLine("Volume of small slice is less than 0");
+                            }
+                    double deltC = C1tot.Sum() - C2tot.Sum();
                         double Xmid = X2 + dx/2;
 
-
-                        deltClist.Add(deltC);
-                        
-                        
-                        Xmidlist.Add(Xmid);
-                        values.Add(new[] { Xmid, deltC });
+                    double deltCV = deltC / deltV;
+                    
+                        values.Add(new[] { Xmid, deltCV });
                         
                     }
                     
