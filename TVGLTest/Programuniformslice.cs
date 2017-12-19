@@ -27,7 +27,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/ABF.stl";
             var filename = "../../../TestFiles/sth2.stl";
             //var filename = "../../../TestFiles/casing.stl";
-
+            //var filename =
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);

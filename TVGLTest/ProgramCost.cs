@@ -24,12 +24,14 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            var filename = "../../../TestFiles/ABF.stl";
+            //var filename = "../../../TestFiles/ABF.stl";
             //var filename = "../../../TestFiles/sth2.stl";
             //var filename = "../../../TestFiles/casing.stl";
             //var filename = "../../../TestFiles/Pump2.stl";
             //var filename = "../../../TestFiles/Cuboide.stl";
-
+            //var filename = "../../../TestFiles/simple_damper.stl";
+            //var filename = "../../../TestFiles/simple_damper.stl";
+            var filename = "../../../TestFiles/ABF.test.stl";
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
@@ -46,6 +48,11 @@ namespace TVGL_Test
             List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
             var values = new List<double[]>();
+            var valuesnew = new List<double[]>();
+            var rawvaluesV1 = new List<double[]>();
+            var rawvaluesV2 = new List<double[]>();
+            var rawvaluesC1 = new List<double[]>();
+            var rawvaluesC2 = new List<double[]>();
 
             //define the number of slices desired and creates small slices, dx
             var Xmax = solid1.XMax;
@@ -105,28 +112,30 @@ namespace TVGL_Test
 
                     //conditional statement for second x cut
                     double X2 = Xmax - (k+1) * dx;
+                    double Xmid1 = X2 + dx / 2;
+                    Console.WriteLine("{0}", Xmid1);
                     List<TessellatedSolid> positiveSolidsXslice2 = new List<TessellatedSolid>();
                     List<TessellatedSolid> negativeSolidsXslice2 = new List<TessellatedSolid>();
                     //returns solid without second cut at xmin
                     if (k == nxslices)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        negativeSolidsXslice2.Add(solid2);
-                        Console.WriteLine("Display original negative solid from X1 at xmin");
+                        //negativeSolidsXslice2.Add(solid2);
+                        Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
                         //Presenter.ShowAndHang(negativeSolidsXslice2);
                     }
                     //returns solid with second cut at xmin
                     else if (X2 < solid2.XMin)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        negativeSolidsXslice2.Add(solid2);
+                        //negativeSolidsXslice2.Add(solid2);
                         Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
                     else if (Math.Abs(X2 - solid2.XMin) < 0.001)
                     {
                         positiveSolidsXslice2.Add(solid2);
-                        negativeSolidsXslice2.Add(solid2);
+                        //negativeSolidsXslice2.Add(solid2);
                         Console.WriteLine("Display original negative solid from X1 when last slice is very small");
                         //Presenter.ShowAndHang(positiveSolidsXslice2);
                     }
@@ -148,6 +157,7 @@ namespace TVGL_Test
                             Console.WriteLine("Above is the cost of the solid after 2nd cut");
                             C2tot.Add(C2);
                             V2tot.Add(costsolid.Volume);
+                        Console.WriteLine("{0}",costsolid.Volume);
                         //Presenter.ShowAndHang(costsolid);
                     }
                     foreach (TessellatedSolid finalsolid in positiveSolidsXslice2)
@@ -160,27 +170,42 @@ namespace TVGL_Test
                             Console.WriteLine("Display positive solids FINAL");
                             //Presenter.ShowAndHang(volumeslist);
                         }
-                    double deltV = V1tot.Sum() - V2tot.Sum();
-                    if (deltV<0)
+                    double deltaV = V1tot.Sum() - V2tot.Sum();
+                    if (deltaV<0)
                         {
                         Console.WriteLine("Volume of small slice is less than 0");
                             }
-                    double deltC = C1tot.Sum() - C2tot.Sum();
+                    double deltaC = C1tot.Sum() - C2tot.Sum();
                         double Xmid = X2 + dx/2;
+                    Console.WriteLine("{0}, {0}", deltaC, deltaV);
 
-                    double deltCV = deltC / deltV;
+                    //another way of calculating
+                    double deltaCV1 = C1tot.Sum() / V1tot.Sum();
+                    double deltaCV2 = C2tot.Sum() / V2tot.Sum();
+                    double deltaCVnew = deltaCV1 - deltaCV2;
+
+                    double deltaCV = deltaC / deltaV;
                     
-                        values.Add(new[] { Xmid, deltCV });
-                        
-                    }
+                    values.Add(new[] { Xmid, deltaCV });
+                    valuesnew.Add(new[] { Xmid, deltaCVnew });
+                    //rawvaluesV1.Add(new[] { Xmid, V1tot.Sum() });
+                    //rawvaluesV2.Add(new[] { Xmid, V2tot.Sum() });
+                    //rawvaluesC1.Add(new[] { Xmid, C1tot.Sum() });
+                    //rawvaluesC2.Add(new[] { Xmid, C2tot.Sum() });
+
+
+                }
                     
                 }
 
             //create paired list
-
-            //  List < List < string >> list_array = new List<List<string>> { first, second };
-            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values });
-
+            
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values });
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1 });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV2 });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesC1 });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesC2 });
             Presenter.ShowAndHang(volumeslist);
             Console.WriteLine("Completed.");
             Console.ReadKey();
