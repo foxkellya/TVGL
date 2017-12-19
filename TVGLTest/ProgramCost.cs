@@ -31,7 +31,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/Cuboide.stl";
             //var filename = "../../../TestFiles/simple_damper.stl";
             //var filename = "../../../TestFiles/simple_damper.stl";
-            var filename = "../../../TestFiles/ABF.test.stl";
+            var filename = "../../../TestFiles/partsample.STL";
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
@@ -43,6 +43,10 @@ namespace TVGL_Test
             var solid1 = solids[0];
             double[,] backTransform;
             solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
+
+            //transform solid
+            //double[,] transformMatrix = { { -1.0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1} };
+           // solid1.Transform(transformMatrix);
             //Presenter.ShowAndHang(solids[0]);
 
             List<double> deltCVlist = new List<double>();
@@ -53,6 +57,8 @@ namespace TVGL_Test
             var rawvaluesV2 = new List<double[]>();
             var rawvaluesC1 = new List<double[]>();
             var rawvaluesC2 = new List<double[]>();
+            var rawdeltaC = new List<double[]>();
+            var rawdeltaV = new List<double[]>();
 
             //define the number of slices desired and creates small slices, dx
             var Xmax = solid1.XMax;
@@ -72,6 +78,7 @@ namespace TVGL_Test
                 List<double> C2tot = new List<double>();
                 List<double> V1tot = new List<double>();
                 List<double> V2tot = new List<double>();
+             
 
                 if (k == 0)
                 {
@@ -188,10 +195,13 @@ namespace TVGL_Test
                     
                     values.Add(new[] { Xmid, deltaCV });
                     valuesnew.Add(new[] { Xmid, deltaCVnew });
-                    //rawvaluesV1.Add(new[] { Xmid, V1tot.Sum() });
-                    //rawvaluesV2.Add(new[] { Xmid, V2tot.Sum() });
-                    //rawvaluesC1.Add(new[] { Xmid, C1tot.Sum() });
-                    //rawvaluesC2.Add(new[] { Xmid, C2tot.Sum() });
+                    rawdeltaV.Add(new[] { Xmid, deltaV });
+                    rawdeltaC.Add(new[] { Xmid, deltaC });
+                    rawdeltaC.Add(new[] { Xmid, deltaC });
+                    rawvaluesV1.Add(new[] { Xmid, V1tot.Sum() });
+                    rawvaluesV2.Add(new[] { Xmid, V2tot.Sum() });
+                    rawvaluesC1.Add(new[] { Xmid, C1tot.Sum() });
+                    rawvaluesC2.Add(new[] { Xmid, C2tot.Sum() });
 
 
                 }
@@ -201,11 +211,9 @@ namespace TVGL_Test
             //create paired list
             
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values });
-            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew });
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1 });
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV2 });
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesC1 });
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesC2 });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1,rawvaluesV2, rawvaluesC1,rawvaluesC2 });
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawdeltaC,rawdeltaV });
             Presenter.ShowAndHang(volumeslist);
             Console.WriteLine("Completed.");
             Console.ReadKey();
