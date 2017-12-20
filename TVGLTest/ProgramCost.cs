@@ -43,11 +43,16 @@ namespace TVGL_Test
             var solid1 = solids[0];
             double[,] backTransform;
             solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-
-            //transform solid
-            //double[,] transformMatrix = { { -1.0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1} };
-           // solid1.Transform(transformMatrix);
-            //Presenter.ShowAndHang(solids[0]);
+            
+            //try to: transform solid
+            //double[,] transformMatrix =
+            //    {
+            //    { -1, 0, 0, 0 },
+            //    { 0, -1, 0, 0 },
+            //    { 0, 0, 1, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
+            //solid1.Transform(transformMatrix);
 
             List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
@@ -208,12 +213,11 @@ namespace TVGL_Test
                     
                 }
 
-            //create paired list
-            
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values });
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew });
+            //generate excel graphs of the data
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("deltaC/deltaV)"));
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew }, filename, string.Format("Xposition"),String.Format("C2 / V2 - C1 / V1"));
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1,rawvaluesV2, rawvaluesC1,rawvaluesC2 });
-            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawdeltaC,rawdeltaV });
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawdeltaC,rawdeltaV });
             Presenter.ShowAndHang(volumeslist);
             Console.WriteLine("Completed.");
             Console.ReadKey();
