@@ -42,17 +42,22 @@ namespace TVGL_Test
             //define solid
             var solid1 = solids[0];
             double[,] backTransform;
-            solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-            
+          
+            Presenter.ShowAndHang(solid1);
+
             //try to: transform solid
-            //double[,] transformMatrix =
-            //    {
-            //    { -1, 0, 0, 0 },
-            //    { 0, -1, 0, 0 },
-            //    { 0, 0, 1, 0 },
-            //    { 0, 0, 0, 1}
-            //    };
-            //solid1.Transform(transformMatrix);
+            double[,] transformMatrix =
+                {
+                { -1, 0, 0, 0 },
+                { 0, -1, 0, 0 },
+                { 0, 0, 1, 0 },
+                { 0, 0, 0, 1}
+                };
+
+            solid1.Transform(transformMatrix);
+            //solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
+            //solid1.Transform(backTransform);
+           // Presenter.ShowAndHang(solid1);
 
             List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
