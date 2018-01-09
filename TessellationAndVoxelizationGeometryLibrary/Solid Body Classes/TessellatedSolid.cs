@@ -1037,14 +1037,13 @@ namespace TVGL
         /// <param name="transformMatrix">The transform matrix.</param>
         public void Transform(double[,] transformMatrix)
         {
+
+
+
+
+
             double[] tempCoord;
-            foreach (var vert in Vertices)
-            {
-                tempCoord = transformMatrix.multiply(new[] { vert.X, vert.Y, vert.Z, 1 });
-                vert.Position[0] = tempCoord[0];
-                vert.Position[1] = tempCoord[1];
-                vert.Position[2] = tempCoord[2];
-            }
+            //find potential new max and min values
             tempCoord = transformMatrix.multiply(new[] { XMin, YMin, ZMin, 1 });
             XMin = tempCoord[0];
             YMin = tempCoord[1];
@@ -1054,6 +1053,39 @@ namespace TVGL
             XMax = tempCoord[0];
             YMax = tempCoord[1];
             ZMax = tempCoord[2];
+            foreach (var vert in Vertices)
+            {
+                tempCoord = transformMatrix.multiply(new[] { vert.X, vert.Y, vert.Z, 1 });
+                vert.Position[0] = tempCoord[0];
+                vert.Position[1] = tempCoord[1];
+                vert.Position[2] = tempCoord[2];
+                if (tempCoord[0] < XMin)
+                {
+                    XMin = tempCoord[0];
+                }
+                if (tempCoord[1] < YMin)
+                {
+                    YMin = tempCoord[1];
+                }
+                if (tempCoord[2] < ZMin)
+                {
+                    ZMin = tempCoord[1];
+                }
+                if (tempCoord[0] > XMax)
+                {
+                    XMax = tempCoord[0];
+                }
+                if (tempCoord[1] > YMax)
+                {
+                    YMax = tempCoord[1];
+                }
+                if (tempCoord[2] > ZMax)
+                {
+                    ZMax = tempCoord[2];
+                }
+
+            }
+          
             Center = transformMatrix.multiply(new[] { Center[0], Center[1], Center[2], 1 });
             // I'm not sure this is right, but I'm just using the 3x3 rotational submatrix to rotate the inertia tensor
             if (_inertiaTensor != null)

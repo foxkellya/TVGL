@@ -43,7 +43,7 @@ namespace TVGL_Test
             var solid1 = solids[0];
             double[,] backTransform;
           
-            Presenter.ShowAndHang(solid1);
+            //Presenter.ShowAndHang(solid1);
 
             //try to: transform solid
             double[,] transformMatrix =
@@ -55,8 +55,8 @@ namespace TVGL_Test
                 };
 
             solid1.Transform(transformMatrix);
-            //solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-            //solid1.Transform(backTransform);
+            solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
+            solid1.Transform(backTransform);
            // Presenter.ShowAndHang(solid1);
 
             List<double> deltCVlist = new List<double>();
