@@ -1,0 +1,43 @@
+﻿{
+    "Name": "CostPerMass",
+    "BaseUnit": "DollarPerKilogram",
+    "XmlDoc": "The price of materials by weight. Often used in cost models.",
+    "Units": [
+      {
+        "SingularName": "DollarPerKilogram",
+        "PluralName": "DollarsPerKilogram",
+        "FromUnitToBaseFunc": "x",
+        "FromBaseToUnitFunc": "x",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/kg", "dollars/kg", "$/kg" ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerPound",
+        "PluralName": "DollarsPerPound",
+        "FromUnitToBaseFunc": "x/0.45359237",
+        "FromBaseToUnitFunc": "x*0.45359237",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/lb", "dollars/lb", "$/lb"  ]
+          }
+        ]
+      },
+      {
+        "SingularName": "DollarPerTonne",
+        "PluralName": "DollarsPerTonne",
+        "FromUnitToBaseFunc": "x/1000",
+        "FromBaseToUnitFunc": "x*1000",
+        "Localization": [
+          {
+            "Culture": "en-US",
+            "Abbreviations": [ "USD/t", "dollars/t" ]
+          }
+        ]
+      }   
+    ]
+}

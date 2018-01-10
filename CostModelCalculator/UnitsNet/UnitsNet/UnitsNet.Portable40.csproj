@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{52C647A6-A05A-4CBD-A18A-9F1D260800F8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnitsNet</RootNamespace>
+    <AssemblyName>UnitsNet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile344</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputPath>..\Artifacts\Bin\Src\$(Platform)_$(Configuration)\portable-net40+sl5+win+wp80+wpa81\</OutputPath>
+    <IntermediateOutputPath>obj\Portable40\</IntermediateOutputPath>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AmbiguousUnitParseException.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="CustomCode\Extensions\AmplitudeRatioExtensions.cs" />
+    <Compile Include="CustomCode\Extensions\ElectricPotentialExtensions.cs" />
+    <Compile Include="CustomCode\Extensions\PowerExtensions.cs" />
+    <Compile Include="CustomCode\Extensions\PowerRatioExtensions.cs" />
+    <Compile Include="CustomCode\UnitClasses\AmplitudeRatio.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Angle.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Area.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\BrakeSpecificFuelConsumption.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Density.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Duration.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\DynamicViscosity.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Force.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\KinematicViscosity.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Length.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Level.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Mass.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\MassFlow.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Power.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\PowerRatio.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Pressure.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\RotationalSpeed.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\SpecificEnergy.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Speed.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Torque.extra.cs" />
+    <Compile Include="CustomCode\UnitClasses\Volume.extra.cs" />
+    <Compile Include="CustomCode\UnitSystem.cs" />
+    <Compile Include="GeneratedCode\Enums\AccelerationUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\AmplitudeRatioUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\AngleUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\AreaUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\BrakeSpecificFuelConsumptionUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\CostPerDistanceUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\CostPerMassUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\CostRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\CostUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\DensityUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\DurationUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\DynamicViscosityUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\ElectricCurrentUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\ElectricPotentialUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\ElectricResistanceUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\EnergyUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\FlowUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\ForceChangeRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\ForceUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\FrequencyUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\InformationUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\JoiningRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\KinematicViscosityUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\LengthUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\LevelUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\MassFlowUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\MassUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\MaterialRemovalRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\MultiplierUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\PowerRatioUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\PowerUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\PressureChangeRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\PressureUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\PricePerMassUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\RatioUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\RotationalSpeedUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\SpecificEnergyUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\SpecificWeightUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\SpeedUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\TemperatureChangeRateUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\TemperatureUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\TorqueUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\VitaminAUnit.g.cs" />
+    <Compile Include="GeneratedCode\Enums\VolumeUnit.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Acceleration.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\AmplitudeRatio.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Angle.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Area.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\BrakeSpecificFuelConsumption.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Cost.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\CostPerDistance.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\CostPerMass.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\CostRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Density.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Duration.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\DynamicViscosity.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\ElectricCurrent.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\ElectricPotential.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\ElectricResistance.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Energy.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Flow.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Force.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\ForceChangeRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Frequency.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Information.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\IUnit.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\JoiningRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\KinematicViscosity.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Length.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Level.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Mass.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\MassFlow.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\MaterialRemovalRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Multiplier.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Power.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\PowerRatio.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Pressure.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\PressureChangeRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\PricePerMass.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Ratio.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\RotationalSpeed.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\SpecificEnergy.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\SpecificWeight.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Speed.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Temperature.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\TemperatureChangeRate.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Torque.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\VitaminA.g.cs" />
+    <Compile Include="GeneratedCode\UnitClasses\Volume.g.cs" />
+    <Compile Include="GeneratedCode\UnitSystem.Default.g.cs" />
+    <Compile Include="I18n\AbbreviationsForCulture.cs" />
+    <Compile Include="I18n\CulturesForEnumValue.cs" />
+    <Compile Include="I18n\UnitLocalization.cs" />
+    <Compile Include="Length2d.cs" />
+    <Compile Include="ObjectProperty.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitFormatter.cs" />
+    <Compile Include="UnitsNetException.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <None Include="packages.UnitsNet.Portable40.config" />
+    <None Include="Scripts\**\*.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations.PCL328">
+      <HintPath>..\..\..\packages\JetBrains.Annotations.10.1.5\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\JetBrains.Annotations.PCL328.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
