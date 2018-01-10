@@ -54,9 +54,9 @@ namespace TVGL_Test
                 { 0, 0, 0, 1}
                 };
 
-            solid1.Transform(transformMatrix);
+            //solid1.Transform(transformMatrix);
             solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-            solid1.Transform(backTransform);
+            //solid1.Transform(backTransform);
            // Presenter.ShowAndHang(solid1);
 
             List<double> deltCVlist = new List<double>();
