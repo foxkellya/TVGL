@@ -42,21 +42,23 @@ namespace TVGL_Test
             //define solid
             var solidOG = solids[0];
             double[,] backTransform;
-            Presenter.ShowAndHang(solidOG);
 
-            //try to: transform solid
+
+            //flip solid to examine other side
             double[,] FlipMatrix =
                 {
-                { -1, 0, 0, 0 },
                 { 0, -1, 0, 0 },
+                { 1, 0, 0, 0 },
                 { 0, 0, 1, 0 },
                 { 0, 0, 0, 1}
                 };
-            solidOG=solidOG.TransformToGetNewSolid(FlipMatrix);
-           
+
+
+            solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
+            //put the solid at the origin 
             var solid1 = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
            
-            Presenter.ShowAndHang(solid1);
+           
 
             List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
@@ -73,12 +75,13 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = .5; //uniform length of square
+            var dx = 1; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
-            for (var k = 0; k <= nxslices; k++)
+            for (var k = 0; k < nxslices; k++)
             {
+                Console.WriteLine("The k iteration is{0}, the nxslices is {0}+1, the total nxslices is{0}", k,nxslices);
                 //create x location of slice
                 double X1 = Xmax - k * dx;
                 //conditional statement for first x cut
@@ -122,9 +125,9 @@ namespace TVGL_Test
                     double C1 = GetCostModels.ForGivenBlankType(solid2, BlankType.RectangularBarStock);
                     Console.WriteLine("Above is the cost of the solid after 1st cut");
                     C1tot.Add(C1);
-                    V1tot.Add(solid2.Volume);
+                    V1tot.Add(Math.Abs(solid2.Volume));
                     //Presenter.ShowAndHang(solid2);
-
+                    
 
                     //conditional statement for second x cut
                     double X2 = Xmax - (k + 1) * dx;
@@ -133,7 +136,7 @@ namespace TVGL_Test
                     List<TessellatedSolid> positiveSolidsXslice2 = new List<TessellatedSolid>();
                     List<TessellatedSolid> negativeSolidsXslice2 = new List<TessellatedSolid>();
                     //returns solid without second cut at xmin
-                    if (k == nxslices)
+                    if (k== nxslices)
                     {
                         positiveSolidsXslice2.Add(solid2);
                         //negativeSolidsXslice2.Add(solid2);
@@ -193,13 +196,13 @@ namespace TVGL_Test
                     }
                     double deltaC = C1tot.Sum() - C2tot.Sum();
                     double Xmid = X2 + dx / 2;
-                    Console.WriteLine("{0}, {0}", deltaC, deltaV);
-
+                    Console.WriteLine("delta C is{0}, delta V is{0}", deltaC, deltaV);
+                    
                     //another way of calculating
                     double deltaCV1 = C1tot.Sum() / V1tot.Sum();
                     double deltaCV2 = C2tot.Sum() / V2tot.Sum();
                     double deltaCVnew = deltaCV1 - deltaCV2;
-
+                    Console.WriteLine("delta Cv1 is{0}, delta cV2 is{0}", deltaCV1, deltaCV2);
                     double deltaCV = deltaC / deltaV;
 
                     values.Add(new[] { Xmid, deltaCV });
