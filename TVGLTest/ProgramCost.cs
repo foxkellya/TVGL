@@ -29,9 +29,10 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/casing.stl";
             //var filename = "../../../TestFiles/Pump2.stl";
             //var filename = "../../../TestFiles/Cuboide.stl";
-            //var filename = "../../../TestFiles/simple_damper.stl";
-            //var filename = "../../../TestFiles/simple_damper.stl";
-            var filename = "../../../TestFiles/partsample.STL";
+            // var filename = "../../../TestFiles/adaptor.stl";
+            // var filename = "../../../TestFiles/simple_damper.stl";
+            //var filename = "../../../TestFiles/partsample.STL";
+            var filename = "../../../TestFiles/samplepart2.STL";
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
@@ -47,9 +48,9 @@ namespace TVGL_Test
             //flip solid to examine other side
             double[,] FlipMatrix =
                 {
-                { 0, -1, 0, 0 },
+                { 0, 0, -1, 0 },
+                { 0, 1, 0, 0 },
                 { 1, 0, 0, 0 },
-                { 0, 0, 1, 0 },
                 { 0, 0, 0, 1}
                 };
 
@@ -222,7 +223,7 @@ namespace TVGL_Test
 
             //generate excel graphs of the data
             TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("deltaC/deltaV)"));
-            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew }, filename, string.Format("Xposition"), String.Format("C2 / V2 - C1 / V1"));
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew }, filename, string.Format("Xposition"), String.Format("C2 / V2 - C1 / V1"));
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1,rawvaluesV2, rawvaluesC1,rawvaluesC2 });
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawdeltaC,rawdeltaV });
             Presenter.ShowAndHang(volumeslist);
