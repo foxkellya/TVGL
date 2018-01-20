@@ -9,21 +9,6 @@ namespace BlankFactory.CostModels
 {
     public class MachiningCostModel : ICostModel
     {
-        //[kg]
-        private readonly Mass _lowMassMax = Mass.FromKilograms(2.5);
-        private readonly Mass _medMassMax = Mass.FromKilograms(10);
-
-        //[minutes]
-        private readonly Duration _lowMassSetupTime = Duration.FromMinutes(3);
-        private readonly Duration _lowMassLoadTime = Duration.FromMinutes(1);
-        private readonly Duration _lowMassUnloadTime = Duration.FromMinutes(1);
-        private readonly Duration _medMassSetupTime = Duration.FromMinutes(5);
-        private readonly Duration _medMassLoadTime = Duration.FromMinutes(5);
-        private readonly Duration _medMassUnloadTime = Duration.FromMinutes(5);
-        private readonly Duration _highMassSetupTime = Duration.FromMinutes(8);
-        private readonly Duration _highMassLoadTime = Duration.FromMinutes(10);
-        private readonly Duration _highMassUnloadTime = Duration.FromMinutes(10);
-
         private readonly SearchInputs _inputs;
 
         private readonly bool _roughCutAll;
@@ -56,29 +41,17 @@ namespace BlankFactory.CostModels
         //[minutes]
         [Display(Name = "Setup Time")]
         [CostModelViewUnit(DurationUnit.Minute)]
-        public Duration SetupTime
-            =>
-                StockMass <= _lowMassMax
-                    ? _lowMassSetupTime
-                    : (StockMass <= _medMassMax ? _medMassSetupTime : _highMassSetupTime);
+        public Duration SetupTime => Duration.FromMinutes(5);
 
         //[minutes]
         [Display(Name = "Load Time")]
         [CostModelViewUnit(DurationUnit.Minute)]
-        public Duration LoadTime
-            =>
-                StockMass <= _lowMassMax
-                    ? _lowMassLoadTime
-                    : (StockMass <= _medMassMax ? _medMassLoadTime : _highMassLoadTime);
+        public Duration LoadTime => Duration.FromMinutes(5);
 
         //[minutes]
         [Display(Name = "Unload Time")]
         [CostModelViewUnit(DurationUnit.Minute)]
-        public Duration UnloadTime
-            =>
-                StockMass <= _lowMassMax
-                    ? _lowMassUnloadTime
-                    : (StockMass <= _medMassMax ? _medMassUnloadTime : _highMassUnloadTime);
+        public Duration UnloadTime => Duration.FromMinutes(5);
 
         [Display(Name = "Total Volume Removed")]
         //[mm^3]

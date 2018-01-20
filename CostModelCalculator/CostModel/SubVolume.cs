@@ -585,6 +585,7 @@ namespace KatanaObjects.BaseClasses
                 RectangularBlankCrossSections = GetRectangularBlankCrossSections();
                 //Tesselated Solids are not set to lower memory because they are not needed in all cases.
                 _rectangularBlankSolid = new Lazy<TessellatedSolid>(GetRectangularBlankSolid);
+                //Presenter.ShowAndHangTransparentsAndSolids(new List<TessellatedSolid>{ GetRectangularBlankSolid()}, new List<TessellatedSolid>{Solid});
             }
         } 
         #endregion

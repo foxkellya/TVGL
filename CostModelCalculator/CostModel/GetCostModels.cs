@@ -77,7 +77,7 @@ namespace CostModelCalculator
             //Additive is invalid if smallest OBB dimension < 2 * searchInputs.WireFeed.WireAccuracy
             //Rectangular Bar stock should be valid for as long as the OBB is valid (All OBB dimensions > 0).
             var cost = GetCostOfStock(subvolume, costFactory, blankType);
-            Debug.Print("Min Cost Blank: " + blankType + "  $" + cost.Dollars);
+            Debug.Print("Min Cost Blank: " + blankType + "  $" + cost.Dollars + "  Volume: " + subvolume.RectangularBlankVolume.CubicInches);
             return cost.Dollars;
         }
 
