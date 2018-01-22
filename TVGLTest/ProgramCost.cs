@@ -32,7 +32,8 @@ namespace TVGL_Test
             // var filename = "../../../TestFiles/adaptor.stl";
             // var filename = "../../../TestFiles/simple_damper.stl";
             //var filename = "../../../TestFiles/partsample.STL";
-            var filename = "../../../TestFiles/samplepart2.STL";
+            //var filename = "../../../TestFiles/samplepart2.STL";
+            var filename = "../../../TestFiles/samplepart3.STL";
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
@@ -56,14 +57,14 @@ namespace TVGL_Test
             //    { 0, 0, 0, 1}
             //    };
 
-            ////turn in y direction
-            //double[,] FlipMatrix =
-            //   {
-            //    { 0, -1, 0, 0 },
-            //    { 1, 0, 0, 0 },
-            //    { 0, 0, 1, 0 },
-            //    { 0, 0, 0, 1}
-            //    };
+            //turn in y direction
+            double[,] FlipMatrix =
+               {
+                { 0, -1, 0, 0 },
+                { 1, 0, 0, 0 },
+                { 0, 0, 1, 0 },
+                { 0, 0, 0, 1}
+                };
 
             ////turn in -y direction
             //double[,] FlipMatrix =
@@ -83,7 +84,7 @@ namespace TVGL_Test
             //    { 0, 0, 0, 1}
             //    };
 
-            //////turn in -z direction
+            ////turn in -z direction
             //double[,] FlipMatrix =
             //   {
             //    { 0, 0, -1, 0 },
@@ -93,7 +94,7 @@ namespace TVGL_Test
             //    };
 
 
-            //solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
+            solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
             //put the solid at the origin 
             var solid1 = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
             //Presenter.ShowAndHang(solid1);
