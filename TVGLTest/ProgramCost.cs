@@ -46,20 +46,58 @@ namespace TVGL_Test
 
 
             //flip solid to examine other side
-            double[,] FlipMatrix =
-                {
-                { 0, 0, -1, 0 },
-                { 0, 1, 0, 0 },
-                { 1, 0, 0, 0 },
-                { 0, 0, 0, 1}
-                };
+
+            ////flip in the x direction
+            //double[,] FlipMatrix =
+            //    {
+            //    { -1, 0, 0, 0 },
+            //    { 0, -1, 0, 0 },
+            //    { 0, 0, 1, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
+
+            ////turn in y direction
+            //double[,] FlipMatrix =
+            //   {
+            //    { 0, -1, 0, 0 },
+            //    { 1, 0, 0, 0 },
+            //    { 0, 0, 1, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
+
+            ////turn in -y direction
+            //double[,] FlipMatrix =
+            //   {
+            //    { 0, 1, 0, 0 },
+            //    { -1, 0, 0, 0 },
+            //    { 0, 0, 1, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
+
+            //////turn in z direction
+            //double[,] FlipMatrix =
+            //   {
+            //    { 0, 0, 1, 0 },
+            //    { 0, 1, 0, 0 },
+            //    { -1, 0, 0, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
+
+            //////turn in -z direction
+            //double[,] FlipMatrix =
+            //   {
+            //    { 0, 0, -1, 0 },
+            //    { 0, 1, 0, 0 },
+            //    { 1, 0, 0, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
 
 
-            solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
+            //solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
             //put the solid at the origin 
             var solid1 = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
-           
-           
+            //Presenter.ShowAndHang(solid1);
+
 
             List<double> deltCVlist = new List<double>();
             List<double> Xmidlist = new List<double>();
