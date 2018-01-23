@@ -48,7 +48,7 @@ namespace TVGL_Test
 
             //flip solid to examine other side
 
-            ////flip in the x direction
+            //flip in the x direction
             //double[,] FlipMatrix =
             //    {
             //    { -1, 0, 0, 0 },
@@ -57,14 +57,14 @@ namespace TVGL_Test
             //    { 0, 0, 0, 1}
             //    };
 
-            //turn in y direction
-            double[,] FlipMatrix =
-               {
-                { 0, -1, 0, 0 },
-                { 1, 0, 0, 0 },
-                { 0, 0, 1, 0 },
-                { 0, 0, 0, 1}
-                };
+            ////turn in y direction
+            //double[,] FlipMatrix =
+            //   {
+            //    { 0, -1, 0, 0 },
+            //    { 1, 0, 0, 0 },
+            //    { 0, 0, 1, 0 },
+            //    { 0, 0, 0, 1}
+            //    };
 
             ////turn in -y direction
             //double[,] FlipMatrix =
@@ -93,8 +93,8 @@ namespace TVGL_Test
             //    { 0, 0, 0, 1}
             //    };
 
-
-            solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
+            //flip solid to correct orientation
+            //solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
             //put the solid at the origin 
             var solid1 = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
             //Presenter.ShowAndHang(solid1);
@@ -229,35 +229,35 @@ namespace TVGL_Test
                         Console.WriteLine("Display positive solids FINAL");
                         //Presenter.ShowAndHang(volumeslist);
                     }
-                    double deltaV = V1tot.Sum() - V2tot.Sum();
-                    if (deltaV < 0)
-                    {
-                        Console.WriteLine("Volume of small slice is less than 0");
-                    }
-                    double deltaC = C1tot.Sum() - C2tot.Sum();
-                    double Xmid = X2 + dx / 2;
-                    Console.WriteLine("delta C is{0}, delta V is{0}", deltaC, deltaV);
-                    
-                    //another way of calculating
-                    double deltaCV1 = C1tot.Sum() / V1tot.Sum();
-                    double deltaCV2 = C2tot.Sum() / V2tot.Sum();
-                    double deltaCVnew = deltaCV1 - deltaCV2;
-                    Console.WriteLine("delta Cv1 is{0}, delta cV2 is{0}", deltaCV1, deltaCV2);
-                    double deltaCV = deltaC / deltaV;
-
-                    values.Add(new[] { Xmid, deltaCV });
-                    valuesnew.Add(new[] { Xmid, deltaCVnew });
-                    rawdeltaV.Add(new[] { Xmid, deltaV });
-                    rawdeltaC.Add(new[] { Xmid, deltaC });
-                    rawdeltaC.Add(new[] { Xmid, deltaC });
-                    rawvaluesV1.Add(new[] { Xmid, V1tot.Sum() });
-                    rawvaluesV2.Add(new[] { Xmid, V2tot.Sum() });
-                    rawvaluesC1.Add(new[] { Xmid, C1tot.Sum() });
-                    rawvaluesC2.Add(new[] { Xmid, C2tot.Sum() });
+                   
 
 
                 }
+                double deltaV = V1tot.Sum() - V2tot.Sum();
+                if (deltaV < 0)
+                {
+                    Console.WriteLine("Volume of small slice is less than 0");
+                }
+                double deltaC = C1tot.Sum() - C2tot.Sum();
+                double Xmid = X1 - dx / 2;
+                Console.WriteLine("delta C is{0}, delta V is{0}", deltaC, deltaV);
 
+                //another way of calculating
+                double deltaCV1 = C1tot.Sum() / V1tot.Sum();
+                double deltaCV2 = C2tot.Sum() / V2tot.Sum();
+                double deltaCVnew = deltaCV1 - deltaCV2;
+                Console.WriteLine("delta Cv1 is{0}, delta cV2 is{0}", deltaCV1, deltaCV2);
+                double deltaCV = deltaC / deltaV;
+
+                values.Add(new[] { Xmid, deltaCV });
+                valuesnew.Add(new[] { Xmid, deltaCVnew });
+                rawdeltaV.Add(new[] { Xmid, deltaV });
+                rawdeltaC.Add(new[] { Xmid, deltaC });
+                rawdeltaC.Add(new[] { Xmid, deltaC });
+                rawvaluesV1.Add(new[] { Xmid, V1tot.Sum() });
+                rawvaluesV2.Add(new[] { Xmid, V2tot.Sum() });
+                rawvaluesC1.Add(new[] { Xmid, C1tot.Sum() });
+                rawvaluesC2.Add(new[] { Xmid, C2tot.Sum() });
             }
 
             //generate excel graphs of the data
