@@ -789,6 +789,102 @@ namespace TVGL
         }
 
 
+        
+        
+        /// <summary>
+        /// Creates a rainbow brush.
+        /// </summary>
+        /// <returns>
+        /// A rainbow brush.
+        /// </returns>
+        public static LinearGradientBrush CreateRainbowBrush(bool horizontal = true)
+        {
+            var brush = new LinearGradientBrush { StartPoint = new System.Windows.Point(0, 0),
+                EndPoint = horizontal ? new System.Windows.Point(1, 0) 
+                    : new System.Windows.Point(0, 1) };
+            brush.GradientStops.Add(new GradientStop(Colors.Red, 0.00));
+            brush.GradientStops.Add(new GradientStop(Colors.Orange, 0.17));
+            brush.GradientStops.Add(new GradientStop(Colors.Yellow, 0.33));
+            brush.GradientStops.Add(new GradientStop(Colors.Green, 0.50));
+            brush.GradientStops.Add(new GradientStop(Colors.Blue, 0.67));
+            brush.GradientStops.Add(new GradientStop(Colors.Indigo, 0.84));
+            brush.GradientStops.Add(new GradientStop(Colors.Violet, 1.00));
+            return brush;
+        }
+        /// <summary>
+        /// Makes the model visual3 d.
+        /// </summary>
+        /// <param name="ts">The ts.</param>
+        /// <returns>Visual3D.</returns>
+        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts)
+        {
+            var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
+                //new System.Windows.Media.Color
+                //{
+                //    A = ts.SolidColor.A,
+                //    B = ts.SolidColor.B,
+                //    G = ts.SolidColor.G,
+                //    R = ts.SolidColor.R
+                //});
+            if (ts.HasUniformColor)
+            {
+                var random = new Random();
+                var positions =
+                    ts.Faces.SelectMany(
+                        f => f.Vertices.Select(v => new Point3D(v.Position[0], v.Position[1], v.Position[2])));
+                var normals =
+                    ts.Faces.SelectMany(f => f.Vertices.Select(v => new Vector3D(f.Normal[0], f.Normal[1], f.Normal[2])));
+                var texCoords = ts.Faces.SelectMany(
+                    f => f.Vertices.Select(v => new System.Windows.Point(v.Position[0]/ts.XMax,0)));
+                return new ModelVisual3D
+                {
+                    Content =
+                        new GeometryModel3D
+                        {
+                            Geometry = new MeshGeometry3D
+                            {
+                                Positions = new Point3DCollection(positions),
+                                // TriangleIndices = new Int32Collection(triIndices),
+                                TextureCoordinates = new PointCollection(texCoords),
+                                Normals = new Vector3DCollection(normals)
+                            },
+                            Material = defaultMaterial
+                        }
+                };
+            }
+            var result = new ModelVisual3D();
+            foreach (var f in ts.Faces)
+            {
+                var vOrder = new Point3DCollection();
+                for (var i = 0; i < 3; i++)
+                    vOrder.Add(new Point3D(f.Vertices[i].X, f.Vertices[i].Y, f.Vertices[i].Z));
+
+                var c = f.Color == null
+                    ? defaultMaterial
+                    : MaterialHelper.CreateMaterial(new System.Windows.Media.Color
+                    {
+                        A = f.Color.A,
+                        B = f.Color.B,
+                        G = f.Color.G,
+                        R = f.Color.R
+                    });
+                result.Children.Add(new ModelVisual3D
+                {
+                    Content =
+                        new GeometryModel3D
+                        {
+                            Geometry = new MeshGeometry3D { Positions = vOrder },
+                            Material = c
+                        }
+                });
+            }
+            return result;
+        }
+        
+        
+        
+        
+        
         /// <summary>
         /// Makes the model visual3 d.
         /// </summary>
