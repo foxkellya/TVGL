@@ -24,18 +24,12 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            //var filename = "../../../TestFiles/ABF.stl";
-            //var filename = "../../../TestFiles/sth2.stl";
-            //var filename = "../../../TestFiles/casing.stl";
-            //var filename = "../../../TestFiles/Pump2.stl";
-            //var filename = "../../../TestFiles/Cuboide.stl";
-            // var filename = "../../../TestFiles/adaptor.stl";
-            // var filename = "../../../TestFiles/simple_damper.stl";
             //var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
             var filename = "../../../TestFiles/samplepart4.STL";
+
             //open file with TessellatedSolid function
-            //Console.WriteLine("Attempting: " + filename);
+            Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
 
             //create list where all solids will be saved
@@ -103,7 +97,7 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = 1; //uniform length of square
+            var dx = 5; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
@@ -114,10 +108,18 @@ namespace TVGL_Test
             List<double> Vnlist = new List<double>();
             List<double> deltaCp = new List<double>();
             List<double> deltaCn = new List<double>();
+            List<double> deltaVn = new List<double>();
+            List<double> deltaVp = new List<double>();
+            List<double> deltaCpVp = new List<double>();
+            List<double> deltaCnVn = new List<double>();
+
+            List<double> Xmidlist = new List<double>();
+
+            var values = new List<double[]>();
 
             for (var k = 1; k < nxslices; k++)
             {
-                Console.WriteLine("The k iteration is{0}, the nxslices is {0}+1, the total nxslices is{0}", k, nxslices);
+                Console.WriteLine("The k iteration is{0}", k);
                 //create x location of slice
                 double X1 = (k - 1) * dx;
                 //conditional statement for first x cut
@@ -201,19 +203,31 @@ namespace TVGL_Test
 
          
         
-            for (var m = 1; m<deltaCn.Count; m++)
+            for (var m = 0; m<(Cnlist.Count-1); m++)
             {
-
+                //compute change in cost
                 deltaCp.Add(Cplist[m] - Cplist[m + 1]);
                 deltaCn.Add(Cnlist[m + 1] - Cnlist[m]);
+                //compute change in volume
+                deltaVp.Add(Vplist[m] - Vplist[m + 1]);
+                deltaVn.Add(Vnlist[m + 1] - Vnlist[m]);
+                //compute change in cost/change in volume
+                deltaCpVp.Add((Cplist[m] - Cplist[m + 1])/ (Vplist[m] - Vplist[m + 1]));
+                deltaCnVn.Add((Cnlist[m] - Cnlist[m + 1]) / (Vnlist[m] - Vnlist[m + 1]));
 
+
+
+                //map change in cost to variable
+                Xmidlist.Add(dx * (m + 0.5));
 
             }
+            //double[] array = new double[] { Xmidlist,deltaCpVp };
+            //values.AddRange({ Xmidlist, deltaCpVp });
 
-        //generate excel graphs of the data
-        //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { deltaCn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1)"));
+            //generate excel graphs of the data
+            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1)"));
 
-    Console.WriteLine("Completed.");
+            Console.WriteLine("Completed.");
             Console.ReadKey();
 
         }
