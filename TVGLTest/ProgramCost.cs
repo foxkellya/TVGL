@@ -33,7 +33,7 @@ namespace TVGL_Test
             // var filename = "../../../TestFiles/simple_damper.stl";
             //var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
-            var filename = "../../../TestFiles/samplepart3.STL";
+            var filename = "../../../TestFiles/samplepart4.STL";
             //open file with TessellatedSolid function
             //Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
@@ -115,7 +115,7 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = 1; //uniform length of square
+            var dx = .01; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
@@ -134,7 +134,7 @@ namespace TVGL_Test
 
                 if (k == 0)
                 {
-                    //returns entire solid at xmax
+                    //returns entire solid at xmax for first iteration
                     negativeSolidsXslice1.Add(solid1);
                     Console.WriteLine("Display all negative solids at X1 slice at xmax");
                     //Presenter.ShowAndHang(negativeSolidsXslice1);
@@ -241,12 +241,6 @@ namespace TVGL_Test
                 double deltaC = C1tot.Sum() - C2tot.Sum();
                 double Xmid = X1 - dx / 2;
                 Console.WriteLine("delta C is{0}, delta V is{0}", deltaC, deltaV);
-
-                //another way of calculating
-                double deltaCV1 = C1tot.Sum() / V1tot.Sum();
-                double deltaCV2 = C2tot.Sum() / V2tot.Sum();
-                double deltaCVnew = deltaCV1 - deltaCV2;
-                Console.WriteLine("delta Cv1 is{0}, delta cV2 is{0}", deltaCV1, deltaCV2);
                 double deltaCV = deltaC / deltaV;
 
                 values.Add(new[] { Xmid, deltaCV });
@@ -261,8 +255,7 @@ namespace TVGL_Test
             }
 
             //generate excel graphs of the data
-            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("deltaC/deltaV)"));
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesnew }, filename, string.Format("Xposition"), String.Format("C2 / V2 - C1 / V1"));
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1)"));
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawvaluesV1,rawvaluesV2, rawvaluesC1,rawvaluesC2 });
             //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { rawdeltaC,rawdeltaV });
             Presenter.ShowAndHang(volumeslist);
