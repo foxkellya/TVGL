@@ -97,7 +97,7 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = 5; //uniform length of square
+            var dx = .01; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
@@ -115,9 +115,11 @@ namespace TVGL_Test
 
             List<double> Xmidlist = new List<double>();
 
-            var values = new List<double[]>();
+            var valuesp = new List<double[]>();
+            var valuesn = new List<double[]>();
+            var valuesmax = new List<double[]>();
 
-            for (var k = 1; k < nxslices; k++)
+            for (var k = 1; k < nxslices+1; k++)
             {
                 Console.WriteLine("The k iteration is{0}", k);
                 //create x location of slice
@@ -137,18 +139,18 @@ namespace TVGL_Test
                     //returns entire solid at xmax for first iteration
 
                     posXsolids.Add(solid1);
-                    //negXsolid.Add(0);
+                    
                     Console.WriteLine("Display all negative solids at X1 slice at xmax");
-                    //Presenter.ShowAndHang(negativeSolidsXslice1);
+                
                 }
                 //add these conditions back in later
-                //else if (k == nxslices)
-                //{
-                //    positiveSolidsXslice2.Add(solid2);
-                //    //negativeSolidsXslice2.Add(solid2);
-                //    Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
-                //    //Presenter.ShowAndHang(negativeSolidsXslice2);
-                //}
+                else if (k == nxslices)
+                {
+                    negXsolids.Add(solid1);
+                    
+                    Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
+                  
+                }
                 ////returns solid with second cut at xmin
                 //else if (X2 < solid2.XMin)
                 //{
@@ -206,26 +208,46 @@ namespace TVGL_Test
             for (var m = 0; m<(Cnlist.Count-1); m++)
             {
                 //compute change in cost
-                deltaCp.Add(Cplist[m] - Cplist[m + 1]);
-                deltaCn.Add(Cnlist[m + 1] - Cnlist[m]);
+                double deltaCpval = Cplist[m] - Cplist[m + 1];
+                double deltaCnval = Cnlist[m + 1] - Cnlist[m];
                 //compute change in volume
-                deltaVp.Add(Vplist[m] - Vplist[m + 1]);
-                deltaVn.Add(Vnlist[m + 1] - Vnlist[m]);
+                double deltaVpval = Vplist[m] - Vplist[m + 1];
+                double deltaVnval = Vnlist[m + 1] - Vnlist[m];
+
+                //compute change in cost over change in volume
+                double deltaCpVpval = deltaCpval / deltaVpval;
+                double deltaCnVnval = deltaCnval / deltaVnval;
+
+                double Xmid = dx * (m + 0.5);
+
+                //save data
+                deltaCp.Add(deltaCpval);
+                deltaCn.Add(deltaCnval);
+                deltaVp.Add(deltaVpval);
+                deltaVn.Add(deltaVnval);
                 //compute change in cost/change in volume
-                deltaCpVp.Add((Cplist[m] - Cplist[m + 1])/ (Vplist[m] - Vplist[m + 1]));
-                deltaCnVn.Add((Cnlist[m] - Cnlist[m + 1]) / (Vnlist[m] - Vnlist[m + 1]));
+                deltaCpVp.Add(deltaCpVpval);
+                deltaCnVn.Add(deltaCnVnval);
+                Xmidlist.Add(Xmid);
 
+                double deltaCmax = deltaCnVnval;
 
-
-                //map change in cost to variable
-                Xmidlist.Add(dx * (m + 0.5));
-
+                if (deltaCpVpval > deltaCnVnval)
+                {
+                    deltaCmax = deltaCpVpval;
+                }
+          
+                
+                valuesp.Add(new[] { Xmid, deltaCpVpval });
+                valuesn.Add(new[] { Xmid, deltaCnVnval });
+                valuesmax.Add(new[] { Xmid, deltaCmax });
             }
-            //double[] array = new double[] { Xmidlist,deltaCpVp };
-            //values.AddRange({ Xmidlist, deltaCpVp });
 
-            //generate excel graphs of the data
-            //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { values }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1)"));
+
+            ////generate excel graphs of the data
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesp }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):positive"));
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):negative"));
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
 
             Console.WriteLine("Completed.");
             Console.ReadKey();
