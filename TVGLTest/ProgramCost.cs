@@ -87,8 +87,17 @@ namespace TVGL_Test
             //    { 0, 0, 0, 1}
             //    };
 
+            //flip in the 45 direction
+            //double[,] FlipMatrix =
+            //    {
+            //    { Math.Cos(30*Math.PI/180), -Math.Sin(30*Math.PI/180), 0, 0 },
+            //    { Math.Sin(30*Math.PI/180), Math.Cos(30*Math.PI/180), 0, 0 },
+            //    {           0,            0,  1, 0 },
+            //    {           0,            0,  0,  1}
+            //    };
+
             //flip solid to correct orientation
-            //solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
+            //var solidOG = solidOG.TransformToGetNewSolid(FlipMatrix);
             //put the solid at the origin 
             var solid1 = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
             //Presenter.ShowAndHang(solid1);
@@ -97,7 +106,7 @@ namespace TVGL_Test
             var Xmax = solid1.XMax;
             var Xmin = solid1.XMin;
             //cutting uniform solids
-            var dx = .01; //uniform length of square
+            var dx = 1; //uniform length of square
             var nxdec = (Xmax - Xmin) / dx;
             var nxslices = Math.Floor(nxdec);
 
@@ -218,6 +227,8 @@ namespace TVGL_Test
                 double deltaCpVpval = deltaCpval / deltaVpval;
                 double deltaCnVnval = deltaCnval / deltaVnval;
 
+                
+
                 double Xmid = dx * (m + 0.5);
 
                 //save data
@@ -237,10 +248,24 @@ namespace TVGL_Test
                     deltaCmax = deltaCpVpval;
                 }
           
-                
+  
+                if (m > 2)
+                {
+                    double[] valuem = valuesmax[m-1];
+                    double value = valuem[1];
+
+                    if (deltaCmax>4*value)
+                    {
+                        deltaCmax = value;
+                    }
+
+
+              
+                }
                 valuesp.Add(new[] { Xmid, deltaCpVpval });
                 valuesn.Add(new[] { Xmid, deltaCnVnval });
                 valuesmax.Add(new[] { Xmid, deltaCmax });
+
             }
 
 
