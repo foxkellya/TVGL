@@ -127,6 +127,7 @@ namespace TVGL_Test
             var valuesp = new List<double[]>();
             var valuesn = new List<double[]>();
             var valuesmax = new List<double[]>();
+            var valuesavg = new List<double[]>();
 
             for (var k = 1; k < nxslices+1; k++)
             {
@@ -227,7 +228,9 @@ namespace TVGL_Test
                 double deltaCpVpval = deltaCpval / deltaVpval;
                 double deltaCnVnval = deltaCnval / deltaVnval;
 
-                
+                //find the average of the two
+                double deltaCavgval = (deltaCpVpval + deltaCnVnval) / 2;
+       
 
                 double Xmid = dx * (m + 0.5);
 
@@ -247,32 +250,41 @@ namespace TVGL_Test
                 {
                     deltaCmax = deltaCpVpval;
                 }
-          
-  
-                if (m > 2)
-                {
-                    double[] valuem = valuesmax[m-1];
-                    double value = valuem[1];
 
-                    if (deltaCmax>4*value)
+
+                if (m > 1)
+                {
+
+                    double[] valuem = valuesmax[m - 2];
+                    double value1 = valuem[1];
+                    double[] valuen = valuesmax[m - 1];
+                    double value2 = valuen[1];
+                    double value3 = deltaCmax;
+                    if (value2 > (6*value1) & value2 > (6*value1))
                     {
-                        deltaCmax = value;
+                        value2 = (value3 + value1) / 2;
+                        double Xmid2 = dx * ((m - 1) + 0.5);
+                        valuesmax.RemoveAt(m - 1);
+                        valuesmax.Add(new[] { Xmid2, value2 });
                     }
 
 
-              
+
                 }
                 valuesp.Add(new[] { Xmid, deltaCpVpval });
                 valuesn.Add(new[] { Xmid, deltaCnVnval });
                 valuesmax.Add(new[] { Xmid, deltaCmax });
+                valuesavg.Add(new[] { Xmid, deltaCavgval });
 
             }
-
+            valuesmax.RemoveAt(0);
+            valuesmax.RemoveAt(Cnlist.Count - 3);
 
             ////generate excel graphs of the data
             TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesp }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):positive"));
             TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):negative"));
             TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
+            TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
 
             Console.WriteLine("Completed.");
             Console.ReadKey();
