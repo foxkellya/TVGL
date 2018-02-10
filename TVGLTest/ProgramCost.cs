@@ -41,8 +41,25 @@ namespace TVGL_Test
 
             List<double[,]> FlipMatrices = new List<double[,]>();
 
-            //create flip matrices
+            //create storage areas
+            List<double> xvalmax = new List<double>();
+            List<double> xvalp = new List<double>();
+            List<double> xvaln = new List<double>();
+            List<double> xvalavg = new List<double>();
+            List<double> xvalxmid = new List<double>();
+            List<double> yvalmax = new List<double>();
+            List<double> yvalp = new List<double>();
+            List<double> yvaln = new List<double>();
+            List<double> yvalavg = new List<double>();
+            List<double> yvalxmid = new List<double>();
+            List<double> zvalmax = new List<double>();
+            List<double> zvalp = new List<double>();
+            List<double> zvaln = new List<double>();
+            List<double> zvalavg = new List<double>();
+            List<double> zvalxmid = new List<double>();
 
+
+            //Create flip matrices
             //examine in the x direction(identity matrix)
 
             double[,] xFlipMatrix =
@@ -97,6 +114,8 @@ namespace TVGL_Test
                 var nxdec = (Xmax - Xmin) / dx;
                 var nxslices = Math.Floor(nxdec);
 
+               
+
                 //create arrays to store info in
                 List<double> Cplist = new List<double>();
                 List<double> Cnlist = new List<double>();
@@ -106,10 +125,13 @@ namespace TVGL_Test
                 List<double> deltaCn = new List<double>();
                 List<double> deltaVn = new List<double>();
                 List<double> deltaVp = new List<double>();
-                List<double> deltaCpVp = new List<double>();
-                List<double> deltaCnVn = new List<double>();
 
-                List<double> Xmidlist = new List<double>();
+
+                List<double> valmax = new List<double>();
+                List<double> valp = new List<double>();
+                List<double> valn = new List<double>();
+                List<double> valavg = new List<double>();
+                List<double> valxmid = new List<double>();
 
                 var valuesp = new List<double[]>();
                 var valuesn = new List<double[]>();
@@ -219,17 +241,15 @@ namespace TVGL_Test
                     double deltaCavgval = (deltaCpVpval + deltaCnVnval) / 2;
 
 
-                    double Xmid = dx * (m + 0.5);
+                    double Xmidval = dx * (m + 0.5);
 
                     //save data
                     deltaCp.Add(deltaCpval);
                     deltaCn.Add(deltaCnval);
                     deltaVp.Add(deltaVpval);
                     deltaVn.Add(deltaVnval);
-                    //compute change in cost/change in volume
-                    deltaCpVp.Add(deltaCpVpval);
-                    deltaCnVn.Add(deltaCnVnval);
-                    Xmidlist.Add(Xmid);
+                    
+                 
 
                     double deltaCmax = deltaCnVnval;
 
@@ -238,10 +258,10 @@ namespace TVGL_Test
                         deltaCmax = deltaCpVpval;
                     }
 
-
+                    //take out extreme points in the lists
                     if (m > 1)
                     {
-
+                        //take out extreme points for EXCEL
                         double[] valuem = valuesmax[m - 2];
                         double value1 = valuem[1];
                         double[] valuen = valuesmax[m - 1];
@@ -255,30 +275,90 @@ namespace TVGL_Test
                             valuesmax.Add(new[] { Xmid2, value2 });
                         }
 
-
+                       //take out extreme points for valmax list
+                        double val1 = valmax[m-2];
+                        double val2 = valmax[m-1];
+                        double val3 = deltaCmax;
+                        if (val2 > (6 * val1) & val2 > (6 * val1))
+                        {
+                            val2 = (val3 + val1) / 2;
+                           
+                            valmax.RemoveAt(m - 1);
+                            valmax.Add(val2);
+                        }
 
                     }
-                    valuesp.Add(new[] { Xmid, deltaCpVpval });
-                    valuesn.Add(new[] { Xmid, deltaCnVnval });
-                    valuesmax.Add(new[] { Xmid, deltaCmax });
-                    valuesavg.Add(new[] { Xmid, deltaCavgval });
+                    //save data to lists for EXCEL
+                    valuesp.Add(new[] { Xmidval, deltaCpVpval });
+                    valuesn.Add(new[] { Xmidval, deltaCnVnval });
+                    valuesmax.Add(new[] { Xmidval, deltaCmax });
+                    valuesavg.Add(new[] { Xmidval, deltaCavgval });
+
+                    //save data to lists
+                    valp.Add(deltaCpVpval);
+                    valn.Add(deltaCnVnval);
+                    valavg.Add(deltaCavgval);
+                    valmax.Add(deltaCmax);
+                    valxmid.Add(Xmidval);
 
                 }
                 valuesmax.RemoveAt(0);
                 valuesmax.RemoveAt(Cnlist.Count - 3);
 
+                //remove all end points
+                valp.RemoveAt(0);
+                valp.RemoveAt(Cnlist.Count - 3);
+                valn.RemoveAt(0);
+                valn.RemoveAt(Cnlist.Count - 3);
+                valmax.RemoveAt(0);
+                valmax.RemoveAt(Cnlist.Count - 3);
+                valavg.RemoveAt(0);
+                valavg.RemoveAt(Cnlist.Count - 3);
+                valxmid.RemoveAt(0);
+                valxmid.RemoveAt(Cnlist.Count - 3);
+
                 ////generate excel graphs of the data
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesp }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):positive"));
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):negative"));
-                TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
-                TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
+                //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
+                //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
 
-                Console.WriteLine("Completed.");
-                //Console.ReadKey();
+
+                if (dir == 0)
+                {
+                    xvalp.AddRange(valp);
+                    xvaln.AddRange(valn);
+                    xvalavg.AddRange(valavg);
+                    xvalmax.AddRange(valmax);
+                    xvalxmid.AddRange(valxmid);
+                }
+
+                if (dir==1)
+                {
+                    yvalp.AddRange(valp);
+                    yvaln.AddRange(valn);
+                    yvalavg.AddRange(valavg);
+                    yvalmax.AddRange(valmax);
+                    yvalxmid.AddRange(valxmid);
+
+                }
+
+                if (dir==2)
+                {
+                    zvalp.AddRange(valp);
+                    zvaln.AddRange(valn);
+                    zvalavg.AddRange(valavg);
+                    zvalmax.AddRange(valmax);
+                    zvalxmid.AddRange(valxmid);
+                }
+                
+
 
             }
 
 
+            Console.WriteLine("Completed.");
+            //Console.ReadKey();
         }
     }
 }
