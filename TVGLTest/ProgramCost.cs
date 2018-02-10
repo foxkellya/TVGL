@@ -76,16 +76,18 @@ namespace TVGL_Test
             FlipMatrices.Add(yFlipMatrix);
             FlipMatrices.Add(zFlipMatrix);
 
+            //put the solid at the origin 
+            solidOG = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
             for (var dir = 0; dir < FlipMatrices.Count; dir++)
             {
 
 
-                //put the solid at the origin 
-                solidOG = solidOG.SetToOriginAndSquareTesselatedSolid(out backTransform);
+                
                 //flip solid to correct orientation
 
                 var solid1 = solidOG.TransformToGetNewSolid(FlipMatrices[dir]);
                 Presenter.ShowAndHang(solid1);
+                solid1 = solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
 
                 //define the number of slices desired and creates small slices, dx
                 var Xmax = solid1.XMax;
@@ -266,13 +268,13 @@ namespace TVGL_Test
                 valuesmax.RemoveAt(Cnlist.Count - 3);
 
                 ////generate excel graphs of the data
-                TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesp }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):positive"));
-                TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):negative"));
+                //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesp }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):positive"));
+                //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesn }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):negative"));
                 TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
                 TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
 
                 Console.WriteLine("Completed.");
-                Console.ReadKey();
+                //Console.ReadKey();
 
             }
 
