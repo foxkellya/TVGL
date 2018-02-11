@@ -359,7 +359,12 @@ namespace TVGL_Test
             double yv = 4;
             double zv = 4;
 
+            //create array to store x,y,z costs
+            //double[,] array[,] = new Array();
 
+
+            for (var dir1=0; dir1<3,dir1++)
+            { 
             //create places to store data
             double cpv=new double(); 
             double cnv=new double ();
@@ -407,6 +412,9 @@ namespace TVGL_Test
                 cnv = interp * (xvaln[xlsearch + 1] - xvaln[xlsearch]) + xvaln[xlsearch];
                 cavgv = interp * (xvalavg[xlsearch + 1] - xvalavg[xlsearch]) + xvalavg[xlsearch];
                 cmaxv = interp * (xvalmax[xlsearch + 1] - xvalmax[xlsearch]) + xvalmax[xlsearch];
+
+                //save this cool stuff to an array
+                varray[]
             }
 
 
