@@ -37,6 +37,9 @@ namespace TVGL_Test
             var solidOG = solids[0];
             double[,] backTransform;
 
+            //define cutting slice
+            var dx = 1; //uniform length of square
+
             //create list of flip matrices to transform the solid in the x,y,z directions
 
             List<double[,]> FlipMatrices = new List<double[,]>();
@@ -103,14 +106,14 @@ namespace TVGL_Test
                 //flip solid to correct orientation
 
                 var solid1 = solidOG.TransformToGetNewSolid(FlipMatrices[dir]);
-                Presenter.ShowAndHang(solid1);
+                //Presenter.ShowAndHang(solid1);
                 solid1 = solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
 
                 //define the number of slices desired and creates small slices, dx
                 var Xmax = solid1.XMax;
                 var Xmin = solid1.XMin;
                 //cutting uniform solids
-                var dx = 1; //uniform length of square
+                
                 var nxdec = (Xmax - Xmin) / dx;
                 var nxslices = Math.Floor(nxdec);
 
@@ -162,29 +165,14 @@ namespace TVGL_Test
                         Console.WriteLine("Display all negative solids at X1 slice at xmax");
 
                     }
-                    //add these conditions back in later
+                
                     else if (k == nxslices)
                     {
                         negXsolids.Add(solid1);
 
                         Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
 
-                    }
-                    ////returns solid with second cut at xmin
-                    //else if (X2 < solid2.XMin)
-                    //{
-                    //    positiveSolidsXslice2.Add(solid2);
-                    //    //negativeSolidsXslice2.Add(solid2);
-                    //    Console.WriteLine("Display negative solids after XMIN of new solid>second x slice");
-                    //    //Presenter.ShowAndHang(positiveSolidsXslice2);
-                    //}
-                    //else if (Math.Abs(X2 - solid2.XMin) < 0.001)
-                    //{
-                    //    positiveSolidsXslice2.Add(solid2);
-                    //    //negativeSolidsXslice2.Add(solid2);
-                    //    Console.WriteLine("Display original negative solid from X1 when last slice is very small");
-                    //    //Presenter.ShowAndHang(positiveSolidsXslice2);
-                    //}
+                    }            
                     else
                     {
                         //returns solids after cut
@@ -221,9 +209,6 @@ namespace TVGL_Test
 
                 }
                 //get costs to plot
-
-
-
                 for (var m = 0; m < (Cnlist.Count - 1); m++)
                 {
                     //compute change in cost
@@ -248,8 +233,6 @@ namespace TVGL_Test
                     deltaCn.Add(deltaCnval);
                     deltaVp.Add(deltaVpval);
                     deltaVn.Add(deltaVnval);
-                    
-                 
 
                     double deltaCmax = deltaCnVnval;
 
@@ -302,6 +285,7 @@ namespace TVGL_Test
                     valxmid.Add(Xmidval);
 
                 }
+                //removed max end points for EXCEL
                 valuesmax.RemoveAt(0);
                 valuesmax.RemoveAt(Cnlist.Count - 3);
 
@@ -323,6 +307,12 @@ namespace TVGL_Test
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
 
+                //normalize data
+                valp.normalize();
+                valn.normalize();
+                valavg.normalize();
+                valmax.normalize();
+                valxmid.normalize();
 
                 if (dir == 0)
                 {
@@ -359,6 +349,74 @@ namespace TVGL_Test
 
             Console.WriteLine("Completed.");
             //Console.ReadKey();
+
+            //PART 2
+
+            //TESTING with some sample points
+
+            //TESTING:create points within the data
+            double xv = 220;
+            double yv = 4;
+            double zv = 4;
+
+
+            //create places to store data
+            double cpv=new double(); 
+            double cnv=new double ();
+            double cavgv = new double();
+            double cmaxv = new double();
+            //extrapolation case for end points
+            //for first points
+            if (xv<xvalxmid[0])
+            {
+                cpv = xvalp[0];
+                cnv = xvaln[0];
+                cavgv = xvalavg[0];
+                cmaxv = xvalmax[0];
+
+            }
+            //for end points
+            else if (xv > xvalxmid[xvalxmid.Count-1])
+            {
+                cpv = xvalp[xvalxmid.Count-1];
+                cnv = xvaln[xvalxmid.Count-1];
+                cavgv = xvalavg[xvalxmid.Count-1];
+                cmaxv = xvalmax[xvalxmid.Count-1];
+
+            }
+            //interpolation case for mid points
+            else
+            {
+
+                //find the low point
+                var xlsearch = 0;
+                while ((xv - (xvalxmid[xlsearch]) <= dx))
+                {
+                    xlsearch++;
+                }
+                var xmidlow = xvalxmid[xlsearch];
+                //add one step for the high point
+
+                var xmidhigh = xvalxmid[xlsearch + 1];
+
+                //calculate for interpolation in the x points
+                var interp = (xv - xmidlow) / (xmidhigh - xmidlow);
+
+                //apply interpolation to find cost at that point for the different lists
+                cpv = interp * (xvalp[xlsearch + 1] - xvalp[xlsearch]) + xvalp[xlsearch];
+                cnv = interp * (xvaln[xlsearch + 1] - xvaln[xlsearch]) + xvaln[xlsearch];
+                cavgv = interp * (xvalavg[xlsearch + 1] - xvalavg[xlsearch]) + xvalavg[xlsearch];
+                cmaxv = interp * (xvalmax[xlsearch + 1] - xvalmax[xlsearch]) + xvalmax[xlsearch];
+            }
+
+
+
+
+
+
+
+
+
         }
     }
 }
