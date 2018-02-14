@@ -33,7 +33,7 @@ namespace TVGL_Test
             List<TessellatedSolid> solids = IO.Open(filename);
 
 
-            //define solid
+            //define solid:assuming it's just one solid
             var solidOG = solids[0];
             double[,] backTransform;
 
@@ -96,6 +96,9 @@ namespace TVGL_Test
                 { -1, 0, 0, 0 },
                 { 0, 0, 0, 1}
                 };
+            Presenter.CreateRainbowBrush
+
+      
 
             FlipMatrices.Add(xFlipMatrix);
             FlipMatrices.Add(yFlipMatrix);
@@ -134,21 +137,22 @@ namespace TVGL_Test
                 List<double> deltaVn = new List<double>();
                 List<double> deltaVp = new List<double>();
 
-
+                
                 List<double> valmax = new List<double>();
                 List<double> valp = new List<double>();
                 List<double> valn = new List<double>();
                 List<double> valavg = new List<double>();
                 List<double> valxmid = new List<double>();
 
-                var valuesp = new List<double[]>();
-                var valuesn = new List<double[]>();
-                var valuesmax = new List<double[]>();
-                var valuesavg = new List<double[]>();
+                //create lists for excel
+                //var valuesp = new List<double[]>();
+                //var valuesn = new List<double[]>();
+                //var valuesmax = new List<double[]>();
+                //var valuesavg = new List<double[]>();
 
                 for (var k = 1; k < nxslices + 1; k++)
                 {
-                    //Console.WriteLine("The k iteration is{0}", k);
+                
                     //create x location of slice
                     double X1 = (k - 1) * dx;
                     //conditional statement for first x cut
@@ -249,19 +253,19 @@ namespace TVGL_Test
                     //take out extreme points in the lists
                     if (m > 1)
                     {
-                        //take out extreme points for EXCEL
-                        double[] valuem = valuesmax[m - 2];
-                        double value1 = valuem[1];
-                        double[] valuen = valuesmax[m - 1];
-                        double value2 = valuen[1];
-                        double value3 = deltaCmax;
-                        if (value2 > (6 * value1) & value2 > (6 * value1))
-                        {
-                            value2 = (value3 + value1) / 2;
-                            double Xmid2 = dx * ((m - 1) + 0.5);
-                            valuesmax.RemoveAt(m - 1);
-                            valuesmax.Add(new[] { Xmid2, value2 });
-                        }
+                        ////take out extreme points for EXCEL
+                        //double[] valuem = valuesmax[m - 2];
+                        //double value1 = valuem[1];
+                        //double[] valuen = valuesmax[m - 1];
+                        //double value2 = valuen[1];
+                        //double value3 = deltaCmax;
+                        //if (value2 > (6 * value1) & value2 > (6 * value1))
+                        //{
+                        //    value2 = (value3 + value1) / 2;
+                        //    double Xmid2 = dx * ((m - 1) + 0.5);
+                        //    valuesmax.RemoveAt(m - 1);
+                        //    valuesmax.Add(new[] { Xmid2, value2 });
+                        //}
 
                         //take out extreme points for valmax list
                         double val1 = valmax[m - 2];
@@ -276,11 +280,11 @@ namespace TVGL_Test
                         }
 
                     }
-                    //save data to lists for EXCEL
-                    valuesp.Add(new[] { Xmidval, deltaCpVpval });
-                    valuesn.Add(new[] { Xmidval, deltaCnVnval });
-                    valuesmax.Add(new[] { Xmidval, deltaCmax });
-                    valuesavg.Add(new[] { Xmidval, deltaCavgval });
+                    ////save data to lists for EXCEL
+                    //valuesp.Add(new[] { Xmidval, deltaCpVpval });
+                    //valuesn.Add(new[] { Xmidval, deltaCnVnval });
+                    //valuesmax.Add(new[] { Xmidval, deltaCmax });
+                    //valuesavg.Add(new[] { Xmidval, deltaCavgval });
 
                     //save data to lists
                     valp.Add(deltaCpVpval);
@@ -290,9 +294,9 @@ namespace TVGL_Test
                     valxmid.Add(Xmidval);
 
                 }
-                //removed max end points for EXCEL
-                valuesmax.RemoveAt(0);
-                valuesmax.RemoveAt(Cnlist.Count - 3);
+                ////removed max end points for EXCEL
+                //valuesmax.RemoveAt(0);
+                //valuesmax.RemoveAt(Cnlist.Count - 3);
 
                 //remove all end points
                 valp.RemoveAt(0);
@@ -321,57 +325,30 @@ namespace TVGL_Test
                 midarray[dir] = valxmid.normalize().ToArray();
 
 
-                //if (dir == 0)
-                //{
-                //    xvalp.AddRange(valp);
-                //    xvaln.AddRange(valn);
-                //    xvalavg.AddRange(valavg);
-                //    xvalmax.AddRange(valmax);
-                //    xvalxmid.AddRange(valxmid);
-                //}
-
-                //if (dir == 1)
-                //{
-                //    yvalp.AddRange(valp);
-                //    yvaln.AddRange(valn);
-                //    yvalavg.AddRange(valavg);
-                //    yvalmax.AddRange(valmax);
-                //    yvalxmid.AddRange(valxmid);
-
-                //}
-
-                //if (dir == 2)
-                //{
-                //    zvalp.AddRange(valp);
-                //    zvaln.AddRange(valn);
-                //    zvalavg.AddRange(valavg);
-                //    zvalmax.AddRange(valmax);
-                //    zvalxmid.AddRange(valxmid);
-                //}
-
 
 
             }
 
 
             Console.WriteLine("Completed the slicing.");
-            
+
 
             //PART 2
 
-            //TESTING with some sample points
+            //import vertices
+            
 
             //TESTING:create points within the data
             double xv = 220;
             double yv = 4;
             double zv = 4;
 
-            //create array to store x,y,z costs
-            //create array storage areas
-            double[][] cpoint = new double[3][];
-            
- 
+            double[] vertex = new double[] { xv, yv, zv };
+            //for loop to find x,y,z cost directions of a single point
 
+            //create array storage areas
+            double[][] cvertex = new double[3][];
+            
             for (var dir1 = 0; dir1 < 3; dir1++)
             {
                 //create places to store data
@@ -381,7 +358,7 @@ namespace TVGL_Test
                 double cmaxv = new double();
                 //extrapolation case for end points
                 //for first points
-                if (xv < midarray[dir1][0])
+                if (vertex[dir1] < midarray[dir1][0])
                 {
                     cpv = parray[dir1][0];
                     cnv = narray[dir1][0];
@@ -390,7 +367,7 @@ namespace TVGL_Test
 
                 }
                 //for end points
-                else if (xv > midarray[dir1][midarray[dir1].Length - 1])
+                else if (vertex[dir1] > midarray[dir1][midarray[dir1].Length - 1])
                 {
                     cpv = parray[dir1][parray[dir1].Length - 1];
                     cnv = narray[dir1][narray[dir1].Length - 1];
@@ -403,32 +380,33 @@ namespace TVGL_Test
                 {
 
                     //find the low point
-                    var xlsearch = 0;
-                    while ((xv - (midarray[dir1][xlsearch]) <= dx))
+                    var lsearch = 0;
+                    while ((vertex[dir1] - (midarray[dir1][lsearch]) <= dx))
                     {
-                        xlsearch++;
+                        lsearch++;
                     }
-                    var xmidlow = midarray[dir1][xlsearch];
+                    var midlow = midarray[dir1][lsearch];
                     //add one step for the high point
 
-                    var xmidhigh = midarray[dir1][xlsearch + 1];
+                    var xmidhigh = midarray[dir1][lsearch + 1];
 
                     //calculate for interpolation in the x points
-                    var interp = (xv - xmidlow) / (xmidhigh - xmidlow);
+                    var interp = (vertex[dir1] - midlow) / (xmidhigh - midlow);
 
                     //apply interpolation to find cost at that point for the different lists
-                    cpv = interp * (parray[dir1][xlsearch + 1] - parray[dir1][xlsearch]) + parray[dir1][xlsearch];
-                    cnv = interp * (narray[dir1][xlsearch + 1] - narray[dir1][xlsearch]) + narray[dir1][xlsearch];
-                    cavgv = interp * (avgarray[dir1][xlsearch + 1] - avgarray[dir1][xlsearch]) + avgarray[dir1][xlsearch];
-                    cmaxv = interp * (maxarray[dir1][xlsearch + 1] - maxarray[dir1][xlsearch]) + maxarray[dir1][xlsearch];
+                    cpv = interp * (parray[dir1][lsearch + 1] - parray[dir1][lsearch]) + parray[dir1][lsearch];
+                    cnv = interp * (narray[dir1][lsearch + 1] - narray[dir1][lsearch]) + narray[dir1][lsearch];
+                    cavgv = interp * (avgarray[dir1][lsearch + 1] - avgarray[dir1][lsearch]) + avgarray[dir1][lsearch];
+                    cmaxv = interp * (maxarray[dir1][lsearch + 1] - maxarray[dir1][lsearch]) + maxarray[dir1][lsearch];
 
+                   
 
                 }
 
 
 
                 //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
-                cpoint[dir1] = new double[] { cpv, cnv, cavgv, cmaxv };
+                cvertex[dir1] = new double[] { cpv, cnv, cavgv, cmaxv };
 
                 Console.ReadKey();
 
