@@ -45,23 +45,28 @@ namespace TVGL_Test
             List<double[,]> FlipMatrices = new List<double[,]>();
 
             //create storage areas
-            List<double> xvalmax = new List<double>();
-            List<double> xvalp = new List<double>();
-            List<double> xvaln = new List<double>();
-            List<double> xvalavg = new List<double>();
-            List<double> xvalxmid = new List<double>();
-            List<double> yvalmax = new List<double>();
-            List<double> yvalp = new List<double>();
-            List<double> yvaln = new List<double>();
-            List<double> yvalavg = new List<double>();
-            List<double> yvalxmid = new List<double>();
-            List<double> zvalmax = new List<double>();
-            List<double> zvalp = new List<double>();
-            List<double> zvaln = new List<double>();
-            List<double> zvalavg = new List<double>();
-            List<double> zvalxmid = new List<double>();
+            //List<double> xvalmax = new List<double>();
+            //List<double> xvalp = new List<double>();
+            //List<double> xvaln = new List<double>();
+            //List<double> xvalavg = new List<double>();
+            //List<double> xvalxmid = new List<double>();
+            //List<double> yvalmax = new List<double>();
+            //List<double> yvalp = new List<double>();
+            //List<double> yvaln = new List<double>();
+            //List<double> yvalavg = new List<double>();
+            //List<double> yvalxmid = new List<double>();
+            //List<double> zvalmax = new List<double>();
+            //List<double> zvalp = new List<double>();
+            //List<double> zvaln = new List<double>();
+            //List<double> zvalavg = new List<double>();
+            //List<double> zvalxmid = new List<double>();
 
-
+            //create array storage areas
+            double[][] maxarray = new double[3][];
+            double[][] parray = new double[3][];
+            double[][] narray = new double[3][];
+            double[][] avgarray = new double[3][];
+            double[][] midarray = new double[3][];
             //Create flip matrices
             //examine in the x direction(identity matrix)
 
@@ -102,7 +107,7 @@ namespace TVGL_Test
             {
 
 
-                
+
                 //flip solid to correct orientation
 
                 var solid1 = solidOG.TransformToGetNewSolid(FlipMatrices[dir]);
@@ -113,11 +118,11 @@ namespace TVGL_Test
                 var Xmax = solid1.XMax;
                 var Xmin = solid1.XMin;
                 //cutting uniform solids
-                
+
                 var nxdec = (Xmax - Xmin) / dx;
                 var nxslices = Math.Floor(nxdec);
 
-               
+
 
                 //create arrays to store info in
                 List<double> Cplist = new List<double>();
@@ -143,7 +148,7 @@ namespace TVGL_Test
 
                 for (var k = 1; k < nxslices + 1; k++)
                 {
-                    Console.WriteLine("The k iteration is{0}", k);
+                    //Console.WriteLine("The k iteration is{0}", k);
                     //create x location of slice
                     double X1 = (k - 1) * dx;
                     //conditional statement for first x cut
@@ -162,17 +167,17 @@ namespace TVGL_Test
 
                         posXsolids.Add(solid1);
 
-                        Console.WriteLine("Display all negative solids at X1 slice at xmax");
+                        //Console.WriteLine("Display all negative solids at X1 slice at xmax");
 
                     }
-                
+
                     else if (k == nxslices)
                     {
                         negXsolids.Add(solid1);
 
-                        Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
+                        //Console.WriteLine("Display original negative solid from X1 at xmin, empty for next cost calculation");
 
-                    }            
+                    }
                     else
                     {
                         //returns solids after cut
@@ -189,7 +194,7 @@ namespace TVGL_Test
                     foreach (TessellatedSolid posXsolid in posXsolids)
                     {
                         double C1 = GetCostModels.ForGivenBlankType(posXsolid, BlankType.RectangularBarStock);
-                        Console.WriteLine("Above is the cost of the negative solid");
+                        //Console.WriteLine("Above is the cost of the negative solid");
                         Cptot.Add(C1);
                         Vptot.Add(Math.Abs(posXsolid.Volume));
 
@@ -199,7 +204,7 @@ namespace TVGL_Test
                     foreach (TessellatedSolid negXsolid in negXsolids)
                     {
                         double C1 = GetCostModels.ForGivenBlankType(negXsolid, BlankType.RectangularBarStock);
-                        Console.WriteLine("Above is the cost of the positive solid");
+                        //Console.WriteLine("Above is the cost of the positive solid");
                         Cntot.Add(C1);
                         Vntot.Add(Math.Abs(negXsolid.Volume));
 
@@ -258,14 +263,14 @@ namespace TVGL_Test
                             valuesmax.Add(new[] { Xmid2, value2 });
                         }
 
-                       //take out extreme points for valmax list
-                        double val1 = valmax[m-2];
-                        double val2 = valmax[m-1];
+                        //take out extreme points for valmax list
+                        double val1 = valmax[m - 2];
+                        double val2 = valmax[m - 1];
                         double val3 = deltaCmax;
                         if (val2 > (6 * val1) & val2 > (6 * val1))
                         {
                             val2 = (val3 + val1) / 2;
-                           
+
                             valmax.RemoveAt(m - 1);
                             valmax.Add(val2);
                         }
@@ -307,48 +312,50 @@ namespace TVGL_Test
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesmax }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):max"));
                 //TVGLTest.ExcelInterface.CreateNewGraph(new List<List<double[]>> { valuesavg }, filename, string.Format("Xposition"), string.Format("(C2-C1)/(V2-V1):avg"));
 
-                //normalize data
-                valp.normalize();
-                valn.normalize();
-                valavg.normalize();
-                valmax.normalize();
-                valxmid.normalize();
+      
+                //save data to arrays
+                maxarray[dir] = valmax.normalize().ToArray();
+                parray[dir] = valp.normalize().ToArray();
+                narray[dir] = valn.normalize().ToArray();
+                avgarray[dir] = valavg.normalize().ToArray();
+                midarray[dir] = valxmid.normalize().ToArray();
 
-                if (dir == 0)
-                {
-                    xvalp.AddRange(valp);
-                    xvaln.AddRange(valn);
-                    xvalavg.AddRange(valavg);
-                    xvalmax.AddRange(valmax);
-                    xvalxmid.AddRange(valxmid);
-                }
 
-                if (dir==1)
-                {
-                    yvalp.AddRange(valp);
-                    yvaln.AddRange(valn);
-                    yvalavg.AddRange(valavg);
-                    yvalmax.AddRange(valmax);
-                    yvalxmid.AddRange(valxmid);
+                //if (dir == 0)
+                //{
+                //    xvalp.AddRange(valp);
+                //    xvaln.AddRange(valn);
+                //    xvalavg.AddRange(valavg);
+                //    xvalmax.AddRange(valmax);
+                //    xvalxmid.AddRange(valxmid);
+                //}
 
-                }
+                //if (dir == 1)
+                //{
+                //    yvalp.AddRange(valp);
+                //    yvaln.AddRange(valn);
+                //    yvalavg.AddRange(valavg);
+                //    yvalmax.AddRange(valmax);
+                //    yvalxmid.AddRange(valxmid);
 
-                if (dir==2)
-                {
-                    zvalp.AddRange(valp);
-                    zvaln.AddRange(valn);
-                    zvalavg.AddRange(valavg);
-                    zvalmax.AddRange(valmax);
-                    zvalxmid.AddRange(valxmid);
-                }
-                
+                //}
+
+                //if (dir == 2)
+                //{
+                //    zvalp.AddRange(valp);
+                //    zvaln.AddRange(valn);
+                //    zvalavg.AddRange(valavg);
+                //    zvalmax.AddRange(valmax);
+                //    zvalxmid.AddRange(valxmid);
+                //}
+
 
 
             }
 
 
-            Console.WriteLine("Completed.");
-            //Console.ReadKey();
+            Console.WriteLine("Completed the slicing.");
+            
 
             //PART 2
 
@@ -360,71 +367,76 @@ namespace TVGL_Test
             double zv = 4;
 
             //create array to store x,y,z costs
-            //double[,] array[,] = new Array();
+            //create array storage areas
+            double[][] cpoint = new double[3][];
+            
+ 
 
-
-            for (var dir1=0; dir1<3,dir1++)
-            { 
-            //create places to store data
-            double cpv=new double(); 
-            double cnv=new double ();
-            double cavgv = new double();
-            double cmaxv = new double();
-            //extrapolation case for end points
-            //for first points
-            if (xv<xvalxmid[0])
+            for (var dir1 = 0; dir1 < 3; dir1++)
             {
-                cpv = xvalp[0];
-                cnv = xvaln[0];
-                cavgv = xvalavg[0];
-                cmaxv = xvalmax[0];
-
-            }
-            //for end points
-            else if (xv > xvalxmid[xvalxmid.Count-1])
-            {
-                cpv = xvalp[xvalxmid.Count-1];
-                cnv = xvaln[xvalxmid.Count-1];
-                cavgv = xvalavg[xvalxmid.Count-1];
-                cmaxv = xvalmax[xvalxmid.Count-1];
-
-            }
-            //interpolation case for mid points
-            else
-            {
-
-                //find the low point
-                var xlsearch = 0;
-                while ((xv - (xvalxmid[xlsearch]) <= dx))
+                //create places to store data
+                double cpv = new double();
+                double cnv = new double();
+                double cavgv = new double();
+                double cmaxv = new double();
+                //extrapolation case for end points
+                //for first points
+                if (xv < midarray[dir1][0])
                 {
-                    xlsearch++;
+                    cpv = parray[dir1][0];
+                    cnv = narray[dir1][0];
+                    cavgv = avgarray[dir1][0];
+                    cmaxv = maxarray[dir1][0];
+
                 }
-                var xmidlow = xvalxmid[xlsearch];
-                //add one step for the high point
+                //for end points
+                else if (xv > midarray[dir1][midarray[dir1].Length - 1])
+                {
+                    cpv = parray[dir1][parray[dir1].Length - 1];
+                    cnv = narray[dir1][narray[dir1].Length - 1];
+                    cavgv = avgarray[dir1][avgarray[dir1].Length - 1];
+                    cmaxv = maxarray[dir1][maxarray[dir1].Length - 1];
 
-                var xmidhigh = xvalxmid[xlsearch + 1];
+                }
+                //interpolation case for mid points
+                else
+                {
 
-                //calculate for interpolation in the x points
-                var interp = (xv - xmidlow) / (xmidhigh - xmidlow);
+                    //find the low point
+                    var xlsearch = 0;
+                    while ((xv - (midarray[dir1][xlsearch]) <= dx))
+                    {
+                        xlsearch++;
+                    }
+                    var xmidlow = midarray[dir1][xlsearch];
+                    //add one step for the high point
 
-                //apply interpolation to find cost at that point for the different lists
-                cpv = interp * (xvalp[xlsearch + 1] - xvalp[xlsearch]) + xvalp[xlsearch];
-                cnv = interp * (xvaln[xlsearch + 1] - xvaln[xlsearch]) + xvaln[xlsearch];
-                cavgv = interp * (xvalavg[xlsearch + 1] - xvalavg[xlsearch]) + xvalavg[xlsearch];
-                cmaxv = interp * (xvalmax[xlsearch + 1] - xvalmax[xlsearch]) + xvalmax[xlsearch];
+                    var xmidhigh = midarray[dir1][xlsearch + 1];
 
-                //save this cool stuff to an array
-                varray[]
+                    //calculate for interpolation in the x points
+                    var interp = (xv - xmidlow) / (xmidhigh - xmidlow);
+
+                    //apply interpolation to find cost at that point for the different lists
+                    cpv = interp * (parray[dir1][xlsearch + 1] - parray[dir1][xlsearch]) + parray[dir1][xlsearch];
+                    cnv = interp * (narray[dir1][xlsearch + 1] - narray[dir1][xlsearch]) + narray[dir1][xlsearch];
+                    cavgv = interp * (avgarray[dir1][xlsearch + 1] - avgarray[dir1][xlsearch]) + avgarray[dir1][xlsearch];
+                    cmaxv = interp * (maxarray[dir1][xlsearch + 1] - maxarray[dir1][xlsearch]) + maxarray[dir1][xlsearch];
+
+
+                }
+
+
+
+                //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
+                cpoint[dir1] = new double[] { cpv, cnv, cavgv, cmaxv };
+
+                Console.ReadKey();
+
+
+
+
+
             }
-
-
-
-
-
-
-
-
-
         }
     }
 }
