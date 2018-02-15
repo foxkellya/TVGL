@@ -846,7 +846,7 @@ namespace TVGL
                 var normals =
                     ts.Faces.SelectMany(f => f.Vertices.Select(v => new Vector3D(f.Normal[0], f.Normal[1], f.Normal[2])));
                 var texCoords = ts.Faces.SelectMany(
-                    f => f.Vertices.Select(v => new System.Windows.Point(CostPoint(v.Position, costxyz, dx, costcoords, out cvertex))));
+                    f => f.Vertices.Select(v => new System.Windows.Point(CostPoint(v.Position, costxyz, dx, costcoords),0)));
                 return new ModelVisual3D
                 {
                     Content =
@@ -893,11 +893,81 @@ namespace TVGL
             }
             return result;
         }
-        
-        
-        
-        
-        
+
+        public static double CostPoint(double[] vertex, double[][] costxyz, double dx, double[][] costcoords)
+        {
+
+            //create array storage areas
+            double[] cvertex = new double[3];
+
+
+            //for loop to find x,y,z cost directions of a single point
+            for (var dir1 = 0; dir1 < 3; dir1++)
+            {
+                //create places to store data
+                double cpv = new double();
+
+                //extrapolation case for end points
+                //for first points
+                if (vertex[dir1] < costcoords[dir1][0])
+                {
+                    cpv = costxyz[dir1][0];
+
+
+                }
+                //for end points
+                else if (vertex[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
+                {
+                    cpv = costxyz[dir1][costxyz[dir1].Length - 1];
+
+
+                }
+                //interpolation case for mid points
+                else
+                {
+
+                    //find the low point
+                    var lsearch = 0;
+                    while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                    {
+                        lsearch++;
+                    }
+                    var midlow = costcoords[dir1][lsearch];
+                    //add one step for the high point
+
+                    var xmidhigh = costcoords[dir1][lsearch + 1];
+
+                    //calculate for interpolation in the x points
+                    var interp = (vertex[dir1] - midlow) / (xmidhigh - midlow);
+
+                    //apply interpolation to find cost at that point for the different lists
+                    cpv = interp * (costxyz[dir1][lsearch + 1] - costxyz[dir1][lsearch]) + costxyz[dir1][lsearch];
+
+
+
+
+                }
+
+
+
+                //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
+                cvertex[dir1] = cpv;
+
+
+            
+
+
+            }
+
+            return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
+            //find max of points for a single number
+            //cvertex = Max((cvertex[1],cvertex[2],cvertex[3]);
+        }
+
+
+
+
+
         /// <summary>
         /// Makes the model visual3 d.
         /// </summary>

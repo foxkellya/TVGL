@@ -13,7 +13,7 @@ using KatanaObjects.BaseClasses;
 
 namespace TVGL_Test
 {
-    internal class Program
+    public static class Program
     {
         [STAThread]
         public static void Main(string[] args)
@@ -33,6 +33,9 @@ namespace TVGL_Test
             Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
 
+        
+
+
 
 
             //define solid:assuming it's just one solid
@@ -41,7 +44,7 @@ namespace TVGL_Test
             double[][] costcoords = new double[3][];
 
             //define cutting slice
-            double dx = 1; //uniform length of square
+            double dx = 0.5; //uniform length of square
 
             CostArrays(solidOG, dx, out costxyz, out costcoords);
             Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
