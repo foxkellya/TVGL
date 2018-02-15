@@ -31,31 +31,32 @@ namespace TVGL_Test
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
-           List<TessellatedSolid> solids = IO.Open(filename);
+            List<TessellatedSolid> solids = IO.Open(filename);
 
 
 
             //define solid:assuming it's just one solid
             var solidOG = solids[0];
-            double[][] costxyz=new double[3][];
-            double[][] costcoords=new double[3][];
+            double[][] costxyz = new double[3][];
+            double[][] costcoords = new double[3][];
 
+            //define cutting slice
+            double dx = 1; //uniform length of square
 
-            CostArrays(solidOG, out costxyz,out costcoords);
-            Presenter.ShowAndHangHeatMap(solidOG, costxyz);//goal/final result:cool heat map with vertices!
+            CostArrays(solidOG, dx, out costxyz, out costcoords);
+            Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
         }
 
 
 
-        public static void CostArrays(TessellatedSolid ts, out double[][] costxyz,out double[][]costcoords)
+        public static void CostArrays(TessellatedSolid ts, double dx, out double[][] costxyz, out double[][] costcoords)
         {
 
             //define solid
             var solidOG = ts;
             double[,] backTransform;
 
-            //define cutting slice
-            var dx = 1; //uniform length of square
+
 
             //create list of flip matrices to transform the solid in the x,y,z directions
 
@@ -272,46 +273,44 @@ namespace TVGL_Test
                 avgarray[dir] = valavg.normalize().ToArray();
                 midarray[dir] = valxmid.normalize().ToArray();
 
-              
-      
+
+
 
             }
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
 
             costxyz = maxarray;
-            
+
 
         }
 
-        public static void CostPoint(double[] v.Position, double[][]costxyz, double dx,double[][]costcoords out double[] cvertex) 
+        public static void CostPoint(double[] vertex, double[][] costxyz, double dx, double[][] costcoords, out double ctot)
         {
 
-
-            double[] vertex = v.Position;
-            //for loop to find x,y,z cost directions of a single point
-
             //create array storage areas
-            double[] cvertex = new double[];
+            double[] cvertex = new double[3];
 
+
+            //for loop to find x,y,z cost directions of a single point
             for (var dir1 = 0; dir1 < 3; dir1++)
             {
                 //create places to store data
                 double cpv = new double();
-       
+
                 //extrapolation case for end points
                 //for first points
-                if (v.Position[dir1] < costcoords[dir1][0])
+                if (vertex[dir1] < costcoords[dir1][0])
                 {
                     cpv = costxyz[dir1][0];
-                  
+
 
                 }
                 //for end points
-                else if (v.Position[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
+                else if (vertex[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
                 {
                     cpv = costxyz[dir1][costxyz[dir1].Length - 1];
-               
+
 
                 }
                 //interpolation case for mid points
@@ -320,7 +319,7 @@ namespace TVGL_Test
 
                     //find the low point
                     var lsearch = 0;
-                    while ((v.Position[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                    while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
                     {
                         lsearch++;
                     }
@@ -330,11 +329,11 @@ namespace TVGL_Test
                     var xmidhigh = costcoords[dir1][lsearch + 1];
 
                     //calculate for interpolation in the x points
-                    var interp = (v.Position[dir1] - midlow) / (xmidhigh - midlow);
+                    var interp = (vertex[dir1] - midlow) / (xmidhigh - midlow);
 
                     //apply interpolation to find cost at that point for the different lists
                     cpv = interp * (costxyz[dir1][lsearch + 1] - costxyz[dir1][lsearch]) + costxyz[dir1][lsearch];
-                
+
 
 
 
@@ -343,15 +342,20 @@ namespace TVGL_Test
 
 
                 //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
-                cvertex[dir1] =  cpv ;
+                cvertex[dir1] = cpv;
+
 
                 Console.ReadKey();
 
 
             }
+
+            ctot = (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
             //find max of points for a single number
             //cvertex = Max((cvertex[1],cvertex[2],cvertex[3]);
         }
+    }
+}
         
     
 

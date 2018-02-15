@@ -637,10 +637,10 @@ namespace TVGL
         /// Shows the and hang.
         /// </summary>
         /// <param name="tessellatedSolid">The tessellated solid.</param>
-        public static void ShowAndHangHeatMap(TessellatedSolid tessellatedSolid, double[][] costxyz)
+        public static void ShowAndHangHeatMap(TessellatedSolid tessellatedSolid, double[][] costxyz, double[][]costcoords, double dx)
         {
             var window = new Window3DPlot();
-            window.view1.Children.Add(MakeModelVisual3DHeatMap(tessellatedSolid,  costxyz));
+            window.view1.Children.Add(MakeModelVisual3DHeatMap(tessellatedSolid, costxyz,costcoords,dx));
             window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
             window.ShowDialog();
         }
@@ -827,7 +827,7 @@ namespace TVGL
         /// </summary>
         /// <param name="ts">The ts.</param>
         /// <returns>Visual3D.</returns>
-        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, double[][] costxyz)
+        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, double[][] costxyz, double[][]costcoords,double dx)
         {
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
                 //new System.Windows.Media.Color
@@ -846,7 +846,7 @@ namespace TVGL
                 var normals =
                     ts.Faces.SelectMany(f => f.Vertices.Select(v => new Vector3D(f.Normal[0], f.Normal[1], f.Normal[2])));
                 var texCoords = ts.Faces.SelectMany(
-                    f => f.Vertices.Select(v => new System.Windows.Point(v.Position[0]/ts.XMax,0)));
+                    f => f.Vertices.Select(v => new System.Windows.Point(CostPoint(v.Position, costxyz, dx, costcoords, out cvertex))));
                 return new ModelVisual3D
                 {
                     Content =
@@ -860,6 +860,7 @@ namespace TVGL
                                 Normals = new Vector3DCollection(normals)
                             },
                             Material = defaultMaterial
+                            
                         }
                 };
             }
@@ -878,6 +879,7 @@ namespace TVGL
                         B = f.Color.B,
                         G = f.Color.G,
                         R = f.Color.R
+                        
                     });
                 result.Children.Add(new ModelVisual3D
                 {
