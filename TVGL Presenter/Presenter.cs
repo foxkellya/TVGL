@@ -633,6 +633,17 @@ namespace TVGL
             window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
             window.ShowDialog();
         }
+        /// <summary>
+        /// Shows the and hang.
+        /// </summary>
+        /// <param name="tessellatedSolid">The tessellated solid.</param>
+        public static void ShowAndHangHeatMap(TessellatedSolid tessellatedSolid, double[][] costxyz)
+        {
+            var window = new Window3DPlot();
+            window.view1.Children.Add(MakeModelVisual3DHeatMap(tessellatedSolid,  costxyz));
+            window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
+            window.ShowDialog();
+        }
 
         /// <summary>
         /// Shows the specified tessellated solids in a Helix toolkit window.
@@ -816,7 +827,7 @@ namespace TVGL
         /// </summary>
         /// <param name="ts">The ts.</param>
         /// <returns>Visual3D.</returns>
-        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts)
+        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, double[][] costxyz)
         {
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
                 //new System.Windows.Media.Color

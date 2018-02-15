@@ -37,13 +37,17 @@ namespace TVGL_Test
 
             //define solid:assuming it's just one solid
             var solidOG = solids[0];
+            double[][] costxyz=new double[3][];
+            double[][] costcoords=new double[3][];
 
-            CostArrays(solidOG, out costxyz);
+
+            CostArrays(solidOG, out costxyz,out costcoords);
+            Presenter.ShowAndHangHeatMap(solidOG, costxyz);//goal/final result:cool heat map with vertices!
         }
 
 
 
-        public static void CostArrays(TessellatedSolid ts, out double[][] costxyz)
+        public static void CostArrays(TessellatedSolid ts, out double[][] costxyz,out double[][]costcoords)
         {
 
             //define solid
@@ -93,10 +97,6 @@ namespace TVGL_Test
                 { -1, 0, 0, 0 },
                 { 0, 0, 0, 1}
                 };
-
-
-
-
             FlipMatrices.Add(xFlipMatrix);
             FlipMatrices.Add(yFlipMatrix);
             FlipMatrices.Add(zFlipMatrix);
@@ -169,8 +169,6 @@ namespace TVGL_Test
                             { 1.0,0,0 }),
                             out posXsolids,
                             out negXsolids);
-                        //Console.WriteLine("Display negative solids after X1 slice");
-                        //Presenter.ShowAndHang(negXsolid);
 
                     }
                     //get cost of solids after solving and save them
@@ -278,97 +276,84 @@ namespace TVGL_Test
       
 
             }
-                costxyz = maxarray;
+            //I decided to make the max array, the cost array for this test, but note that all have been created
+            costcoords = midarray;
+
+            costxyz = maxarray;
             
 
         }
 
-        //public static void CostPoint(TessellatedSolid ts, out double[][] costxyz)
-        //{ 
-        //    //PART 2
-
-        ////import vertices
+        public static void CostPoint(double[] v.Position, double[][]costxyz, double dx,double[][]costcoords out double[] cvertex) 
+        {
 
 
-        ////TESTING:create points within the data
-        //double xv = 220;
-        //    double yv = 4;
-        //    double zv = 4;
+            double[] vertex = v.Position;
+            //for loop to find x,y,z cost directions of a single point
 
-        //    double[] vertex = new double[] { xv, yv, zv };
-        //    //for loop to find x,y,z cost directions of a single point
+            //create array storage areas
+            double[] cvertex = new double[];
 
-        //    //create array storage areas
-        //    double[][] cvertex = new double[3][];
+            for (var dir1 = 0; dir1 < 3; dir1++)
+            {
+                //create places to store data
+                double cpv = new double();
+       
+                //extrapolation case for end points
+                //for first points
+                if (v.Position[dir1] < costcoords[dir1][0])
+                {
+                    cpv = costxyz[dir1][0];
+                  
 
-        //    for (var dir1 = 0; dir1 < 3; dir1++)
-        //    {
-        //        //create places to store data
-        //        double cpv = new double();
-        //        double cnv = new double();
-        //        double cavgv = new double();
-        //        double cmaxv = new double();
-        //        //extrapolation case for end points
-        //        //for first points
-        //        if (vertex[dir1] < midarray[dir1][0])
-        //        {
-        //            cpv = parray[dir1][0];
-        //            cnv = narray[dir1][0];
-        //            cavgv = avgarray[dir1][0];
-        //            cmaxv = maxarray[dir1][0];
+                }
+                //for end points
+                else if (v.Position[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
+                {
+                    cpv = costxyz[dir1][costxyz[dir1].Length - 1];
+               
 
-        //        }
-        //        //for end points
-        //        else if (vertex[dir1] > midarray[dir1][midarray[dir1].Length - 1])
-        //        {
-        //            cpv = parray[dir1][parray[dir1].Length - 1];
-        //            cnv = narray[dir1][narray[dir1].Length - 1];
-        //            cavgv = avgarray[dir1][avgarray[dir1].Length - 1];
-        //            cmaxv = maxarray[dir1][maxarray[dir1].Length - 1];
+                }
+                //interpolation case for mid points
+                else
+                {
 
-        //        }
-        //        //interpolation case for mid points
-        //        else
-        //        {
+                    //find the low point
+                    var lsearch = 0;
+                    while ((v.Position[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                    {
+                        lsearch++;
+                    }
+                    var midlow = costcoords[dir1][lsearch];
+                    //add one step for the high point
 
-        //            //find the low point
-        //            var lsearch = 0;
-        //            while ((vertex[dir1] - (midarray[dir1][lsearch]) <= dx))
-        //            {
-        //                lsearch++;
-        //            }
-        //            var midlow = midarray[dir1][lsearch];
-        //            //add one step for the high point
+                    var xmidhigh = costcoords[dir1][lsearch + 1];
 
-        //            var xmidhigh = midarray[dir1][lsearch + 1];
+                    //calculate for interpolation in the x points
+                    var interp = (v.Position[dir1] - midlow) / (xmidhigh - midlow);
 
-        //            //calculate for interpolation in the x points
-        //            var interp = (vertex[dir1] - midlow) / (xmidhigh - midlow);
-
-        //            //apply interpolation to find cost at that point for the different lists
-        //            cpv = interp * (parray[dir1][lsearch + 1] - parray[dir1][lsearch]) + parray[dir1][lsearch];
-        //            cnv = interp * (narray[dir1][lsearch + 1] - narray[dir1][lsearch]) + narray[dir1][lsearch];
-        //            cavgv = interp * (avgarray[dir1][lsearch + 1] - avgarray[dir1][lsearch]) + avgarray[dir1][lsearch];
-        //            cmaxv = interp * (maxarray[dir1][lsearch + 1] - maxarray[dir1][lsearch]) + maxarray[dir1][lsearch];
+                    //apply interpolation to find cost at that point for the different lists
+                    cpv = interp * (costxyz[dir1][lsearch + 1] - costxyz[dir1][lsearch]) + costxyz[dir1][lsearch];
+                
 
 
 
-        //        }
+                }
 
 
 
-        //        //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
-        //        cvertex[dir1] = new double[] { cpv, cnv, cavgv, cmaxv };
+                //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
+                cvertex[dir1] =  cpv ;
 
-        //        Console.ReadKey();
-
-
-        //    }
+                Console.ReadKey();
 
 
             }
+            //find max of points for a single number
+            //cvertex = Max((cvertex[1],cvertex[2],cvertex[3]);
         }
-    }
-}
+        
+    
+
     
 
