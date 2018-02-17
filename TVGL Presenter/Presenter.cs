@@ -847,6 +847,8 @@ namespace TVGL
                     ts.Faces.SelectMany(f => f.Vertices.Select(v => new Vector3D(f.Normal[0], f.Normal[1], f.Normal[2])));
                 var texCoords = ts.Faces.SelectMany(
                     f => f.Vertices.Select(v => new System.Windows.Point(CostPoint(v.Position, costxyz, dx, costcoords),0)));
+
+
                 return new ModelVisual3D
                 {
                     Content =
@@ -909,12 +911,14 @@ namespace TVGL
 
                 //extrapolation case for end points
                 //for first points
-                if (vertex[dir1] < costcoords[dir1][0])
+                if (vertex[dir1] <= (costcoords[dir1][0]))
                 {
                     cpv = costxyz[dir1][0];
 
 
                 }
+             
+
                 //for end points
                 else if (vertex[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
                 {
@@ -925,14 +929,27 @@ namespace TVGL
                 //interpolation case for mid points
                 else
                 {
-
-                    //find the low point
+                    double midlow = new double();
                     var lsearch = 0;
-                    while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                    //find the low point
+                    if (vertex[dir1] < (costcoords[dir1][1]) & vertex[dir1] > (costcoords[dir1][0]))
                     {
-                        lsearch++;
+                        midlow = costcoords[dir1][0];
+
+
                     }
-                    var midlow = costcoords[dir1][lsearch];
+                     
+                    else
+                
+                    {
+                       
+                        while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                        {
+                            lsearch++;
+                        }
+                        midlow = costcoords[dir1][lsearch];
+
+                    }
                     //add one step for the high point
 
                     var xmidhigh = costcoords[dir1][lsearch + 1];
@@ -960,8 +977,13 @@ namespace TVGL
             }
 
             return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
-            //find max of points for a single number
-            //cvertex = Max((cvertex[1],cvertex[2],cvertex[3]);
+
+
+
+
+
+
+
         }
 
 

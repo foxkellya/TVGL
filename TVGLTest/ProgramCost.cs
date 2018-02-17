@@ -28,6 +28,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
             var filename = "../../../TestFiles/samplepart4.STL";
+            //var filename = "../../../TestFiles/pump7.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
@@ -44,7 +45,7 @@ namespace TVGL_Test
             double[][] costcoords = new double[3][];
 
             //define cutting slice
-            double dx = 0.5; //uniform length of square
+            double dx = 1; //uniform length of square
 
             CostArrays(solidOG, dx, out costxyz, out costcoords);
             Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
@@ -233,17 +234,31 @@ namespace TVGL_Test
                     if (m > 1)
                     {
 
-                        //take out extreme points for valmax list
-                        double val1 = valmax[m - 2];
-                        double val2 = valmax[m - 1];
-                        double val3 = deltaCmax;
+                        //take out extreme points for valavg list
+                        double val1 = valavg[m - 2];
+                        double val2 = valavg[m - 1];
+                        double val3 = deltaCavgval;
                         if (val2 > (6 * val1) & val2 > (6 * val1))
                         {
                             val2 = (val3 + val1) / 2;
 
-                            valmax.RemoveAt(m - 1);
-                            valmax.Add(val2);
+                            valavg.RemoveAt(m - 1);
+                            valavg.Add(val2);
                         }
+
+                        //take out extreme points for valmax list
+                        double val1m = valmax[m - 2];
+                        double val2m = valmax[m - 1];
+                        double val3m = deltaCmax;
+                        if (val2m > (6 * val1m) & val2m > (6 * val1m))
+                        {
+                            val2m = (val3m + val1m) / 2;
+
+                            valmax.RemoveAt(m - 1);
+                            valmax.Add(val2m);
+                        }
+
+
 
                     }
 
@@ -270,11 +285,11 @@ namespace TVGL_Test
                 valxmid.RemoveAt(Cnlist.Count - 3);
 
                 //save data to arrays
-                maxarray[dir] = valmax.normalize().ToArray();
+                //maxarray[dir] = valmax.normalize().ToArray();
                 parray[dir] = valp.normalize().ToArray();
                 narray[dir] = valn.normalize().ToArray();
                 avgarray[dir] = valavg.normalize().ToArray();
-                midarray[dir] = valxmid.normalize().ToArray();
+                midarray[dir] = valxmid.ToArray();
 
 
 
@@ -288,77 +303,9 @@ namespace TVGL_Test
 
         }
 
-        public static void CostPoint(double[] vertex, double[][] costxyz, double dx, double[][] costcoords, out double ctot)
-        {
 
-            //create array storage areas
-            double[] cvertex = new double[3];
-
-
-            //for loop to find x,y,z cost directions of a single point
-            for (var dir1 = 0; dir1 < 3; dir1++)
-            {
-                //create places to store data
-                double cpv = new double();
-
-                //extrapolation case for end points
-                //for first points
-                if (vertex[dir1] < costcoords[dir1][0])
-                {
-                    cpv = costxyz[dir1][0];
-
-
-                }
-                //for end points
-                else if (vertex[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
-                {
-                    cpv = costxyz[dir1][costxyz[dir1].Length - 1];
-
-
-                }
-                //interpolation case for mid points
-                else
-                {
-
-                    //find the low point
-                    var lsearch = 0;
-                    while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
-                    {
-                        lsearch++;
-                    }
-                    var midlow = costcoords[dir1][lsearch];
-                    //add one step for the high point
-
-                    var xmidhigh = costcoords[dir1][lsearch + 1];
-
-                    //calculate for interpolation in the x points
-                    var interp = (vertex[dir1] - midlow) / (xmidhigh - midlow);
-
-                    //apply interpolation to find cost at that point for the different lists
-                    cpv = interp * (costxyz[dir1][lsearch + 1] - costxyz[dir1][lsearch]) + costxyz[dir1][lsearch];
-
-
-
-
-                }
-
-
-
-                //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
-                cvertex[dir1] = cpv;
-
-
-                Console.ReadKey();
-
-
-            }
-
-            ctot = (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
-            //find max of points for a single number
-            //cvertex = Max((cvertex[1],cvertex[2],cvertex[3]);
         }
     }
-}
         
     
 
