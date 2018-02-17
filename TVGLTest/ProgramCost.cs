@@ -27,8 +27,9 @@ namespace TVGL_Test
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
-            var filename = "../../../TestFiles/samplepart4.STL";
-            //var filename = "../../../TestFiles/pump7.STL";
+            //var filename = "../../../TestFiles/samplepart4.STL";
+            //var filename = "../../../TestFiles/cuboide.STL";
+            var filename = "../../../TestFiles/Beam_Clean.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
@@ -45,7 +46,7 @@ namespace TVGL_Test
             double[][] costcoords = new double[3][];
 
             //define cutting slice
-            double dx = 1; //uniform length of square
+            double dx = 10; //uniform length of square
 
             CostArrays(solidOG, dx, out costxyz, out costcoords);
             Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
@@ -285,7 +286,7 @@ namespace TVGL_Test
                 valxmid.RemoveAt(Cnlist.Count - 3);
 
                 //save data to arrays
-                //maxarray[dir] = valmax.normalize().ToArray();
+                maxarray[dir] = valmax.normalize().ToArray();
                 parray[dir] = valp.normalize().ToArray();
                 narray[dir] = valn.normalize().ToArray();
                 avgarray[dir] = valavg.normalize().ToArray();
@@ -298,7 +299,7 @@ namespace TVGL_Test
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
 
-            costxyz = maxarray;
+            costxyz = avgarray;
 
 
         }
