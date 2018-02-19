@@ -976,8 +976,8 @@ namespace TVGL
 
             }
 
-            return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
-
+            //return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
+            return cvertex.Max();
 
 
 

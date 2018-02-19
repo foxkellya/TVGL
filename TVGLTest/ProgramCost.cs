@@ -25,28 +25,29 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            //var filename = "../../../TestFiles/partsample.STL";
+            var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
-            var filename = "../../../TestFiles/Beam_Clean.STL";
+            //var filename = "../../../TestFiles/Beam_Clean.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
 
-        
+
 
 
 
 
             //define solid:assuming it's just one solid
             var solidOG = solids[0];
+            solidOG.Complexify();
             double[][] costxyz = new double[3][];
             double[][] costcoords = new double[3][];
 
             //define cutting slice
-            double dx = 10; //uniform length of square
+            double dx = 1; //uniform length of square
 
             CostArrays(solidOG, dx, out costxyz, out costcoords);
             Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
