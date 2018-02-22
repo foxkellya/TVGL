@@ -25,11 +25,12 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            var filename = "../../../TestFiles/partsample.STL";
+            //var filename = "../../../TestFiles/partsample.STL";
             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
+            var filename = "../../../TestFiles/WEDGE.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
@@ -42,7 +43,7 @@ namespace TVGL_Test
 
             //define solid:assuming it's just one solid
             var solidOG = solids[0];
-            solidOG.Complexify();
+           
             double[][] costxyz = new double[3][];
             double[][] costcoords = new double[3][];
 

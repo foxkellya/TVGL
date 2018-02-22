@@ -830,6 +830,9 @@ namespace TVGL
         private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, double[][] costxyz, double[][]costcoords,double dx)
         {
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
+        //complexify solid
+            ts.Complexify();
+
                 //new System.Windows.Media.Color
                 //{
                 //    A = ts.SolidColor.A,
