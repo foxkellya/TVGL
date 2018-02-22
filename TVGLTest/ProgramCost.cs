@@ -29,8 +29,8 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
-            var filename = "../../../TestFiles/Beam_Clean.STL";
-            //var filename = "../../../TestFiles/WEDGE.STL";
+            //var filename = "../../../TestFiles/Beam_Clean.STL";
+            var filename = "../../../TestFiles/WEDGE.STL";
             //var filename = "../../../TestFiles/Beam_Boss.STL";
             //var filename = "../../../TestFiles/testblock2.STL";
 
@@ -38,6 +38,7 @@ namespace TVGL_Test
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
             List<TessellatedSolid> solids = IO.Open(filename);
+           
 
 
 
@@ -46,7 +47,7 @@ namespace TVGL_Test
 
             //define solid:assuming it's just one solid
             var solidOG = solids[0];
-           
+            
             double[][] costxyz = new double[3][];
             double[][] costcoords = new double[3][];
 
@@ -81,7 +82,7 @@ namespace TVGL_Test
             double[][] midarray = new double[3][];
             //Create flip matrices
             //examine in the x direction(identity matrix)
-
+            Presenter.ShowAndHang(solidOG);
             double[,] xFlipMatrix =
                 {
                 { 1, 0, 0, 0 },
@@ -290,17 +291,33 @@ namespace TVGL_Test
                 valxmid.RemoveAt(0);
                 valxmid.RemoveAt(Cnlist.Count - 3);
 
-                
+
+
+
+
+                //scale data 0 to 1
+                var scale = valmax.Max();
+                for (var s=0; s<valmax.Count;s++)
+                {
+                    valmax[s] = valmax[s] / scale;
+
+                }
+
+                //scale data 0 to 1
+                var scale2 = valavg.Max();
+                for (var s2 = 0; s2 < valavg.Count; s2++)
+                {
+                    valavg[s2] = valmax[s2] / scale;
+
+                }
+
 
                 //save data to arrays
-                maxarray[dir] = valmax.normalize().ToArray();
-                parray[dir] = valp.normalize().ToArray();
-                narray[dir] = valn.normalize().ToArray();
-                avgarray[dir] = valavg.normalize().ToArray();
+                maxarray[dir] = valmax.ToArray();
+                //parray[dir] = valp.ToArray();
+                //narray[dir] = valn.normalize().ToArray();
+                avgarray[dir] = valavg.ToArray();
                 midarray[dir] = valxmid.ToArray();
-
-
-
 
             }
             //I decided to make the max array, the cost array for this test, but note that all have been created
