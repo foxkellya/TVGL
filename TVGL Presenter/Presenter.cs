@@ -813,13 +813,13 @@ namespace TVGL
             var brush = new LinearGradientBrush { StartPoint = new System.Windows.Point(0, 0),
                 EndPoint = horizontal ? new System.Windows.Point(1, 0) 
                     : new System.Windows.Point(0, 1) };
-            brush.GradientStops.Add(new GradientStop(Colors.Red, 0.00));
-            brush.GradientStops.Add(new GradientStop(Colors.Orange, 0.17));
-            brush.GradientStops.Add(new GradientStop(Colors.Yellow, 0.33));
-            brush.GradientStops.Add(new GradientStop(Colors.Green, 0.50));
-            brush.GradientStops.Add(new GradientStop(Colors.Blue, 0.67));
-            brush.GradientStops.Add(new GradientStop(Colors.Indigo, 0.84));
-            brush.GradientStops.Add(new GradientStop(Colors.Violet, 1.00));
+            brush.GradientStops.Add(new GradientStop(Colors.Red, 1.00));
+            brush.GradientStops.Add(new GradientStop(Colors.Orange, 0.75));
+            brush.GradientStops.Add(new GradientStop(Colors.Yellow, 0.50));
+            brush.GradientStops.Add(new GradientStop(Colors.Green, 0.25));
+            brush.GradientStops.Add(new GradientStop(Colors.Blue, 0.00));
+            //brush.GradientStops.Add(new GradientStop(Colors.Indigo, 0.84));
+            //brush.GradientStops.Add(new GradientStop(Colors.Violet, 1.00));
             return brush;
         }
         /// <summary>

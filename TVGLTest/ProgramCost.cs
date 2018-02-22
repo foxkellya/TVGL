@@ -29,8 +29,11 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
-            //var filename = "../../../TestFiles/Beam_Clean.STL";
-            var filename = "../../../TestFiles/WEDGE.STL";
+            var filename = "../../../TestFiles/Beam_Clean.STL";
+            //var filename = "../../../TestFiles/WEDGE.STL";
+            //var filename = "../../../TestFiles/Beam_Boss.STL";
+            //var filename = "../../../TestFiles/testblock2.STL";
+
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
@@ -287,6 +290,8 @@ namespace TVGL_Test
                 valxmid.RemoveAt(0);
                 valxmid.RemoveAt(Cnlist.Count - 3);
 
+                
+
                 //save data to arrays
                 maxarray[dir] = valmax.normalize().ToArray();
                 parray[dir] = valp.normalize().ToArray();
@@ -301,7 +306,7 @@ namespace TVGL_Test
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
 
-            costxyz = avgarray;
+            costxyz = maxarray;
 
 
         }
