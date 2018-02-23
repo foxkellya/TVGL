@@ -949,7 +949,7 @@ namespace TVGL
                 
                     {
                        
-                        while ((vertex[dir1] - (costcoords[dir1][lsearch]) <= dx))
+                        while ((vertex[dir1] - (costcoords[dir1][lsearch]) >= dx))
                         {
                             lsearch++;
                         }

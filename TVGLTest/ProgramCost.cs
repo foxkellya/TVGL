@@ -25,12 +25,12 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            //var filename = "../../../TestFiles/partsample.STL";
-            //var filename = "../../../TestFiles/samplepart2.STL";
+            var filename = "../../../TestFiles/partsample.STL";
+             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
-            var filename = "../../../TestFiles/WEDGE.STL";
+            //var filename = "../../../TestFiles/WEDGE.STL";
             //var filename = "../../../TestFiles/Beam_Boss.STL";
             //var filename = "../../../TestFiles/testblock2.STL";
 
