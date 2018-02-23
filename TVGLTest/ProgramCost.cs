@@ -26,8 +26,8 @@ namespace TVGL_Test
 
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/partsample.STL";
-            var filename = "../../../TestFiles/samplepart2.STL";
-            //var filename = "../../../TestFiles/samplepart4.STL";
+            //var filename = "../../../TestFiles/samplepart2.STL";
+            var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
             //var filename = "../../../TestFiles/WEDGE.STL";
@@ -122,7 +122,7 @@ namespace TVGL_Test
                 //flip solid to correct orientation
                 var solid1 = solidOG.TransformToGetNewSolid(FlipMatrices[dir]);
                 solid1 = solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
-                Presenter.ShowAndHang(solid1);
+                //Presenter.ShowAndHang(solid1);
 
                 //define the number of slices desired and creates small slices, dx
                 var Xmax = solid1.XMax;
@@ -323,6 +323,10 @@ namespace TVGL_Test
                 valmax.ForEach(Console.WriteLine);
 
             }
+            
+            
+            
+            
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
             
