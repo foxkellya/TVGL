@@ -25,8 +25,8 @@ namespace TVGL_Test
             TVGL.Message.Verbosity = VerbosityLevels.OnlyCritical;
 
             //pull shape files from folder and define
-            var filename = "../../../TestFiles/partsample.STL";
-             //var filename = "../../../TestFiles/samplepart2.STL";
+            //var filename = "../../../TestFiles/partsample.STL";
+            var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
@@ -94,8 +94,8 @@ namespace TVGL_Test
             ////turn in y direction
             double[,] yFlipMatrix =
                {
-                { 0, -1, 0, 0 },
-                { 1, 0, 0, 0 },
+                { 0, 1, 0, 0 },
+                { -1, 0, 0, 0 },
                 { 0, 0, 1, 0 },
                 { 0, 0, 0, 1}
                 };
@@ -122,6 +122,7 @@ namespace TVGL_Test
                 //flip solid to correct orientation
                 var solid1 = solidOG.TransformToGetNewSolid(FlipMatrices[dir]);
                 solid1 = solid1.SetToOriginAndSquareTesselatedSolid(out backTransform);
+                Presenter.ShowAndHang(solid1);
 
                 //define the number of slices desired and creates small slices, dx
                 var Xmax = solid1.XMax;
@@ -318,10 +319,13 @@ namespace TVGL_Test
                 //narray[dir] = valn.normalize().ToArray();
                 avgarray[dir] = valavg.ToArray();
                 midarray[dir] = valxmid.ToArray();
+                valxmid.ForEach(Console.WriteLine);
+                valmax.ForEach(Console.WriteLine);
 
             }
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
+            
 
             costxyz = maxarray;
 
