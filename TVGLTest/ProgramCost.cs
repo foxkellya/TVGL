@@ -26,8 +26,8 @@ namespace TVGL_Test
 
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/partsample.STL";
-            //var filename = "../../../TestFiles/samplepart2.STL";
-            var filename = "../../../TestFiles/samplepart4.STL";
+            var filename = "../../../TestFiles/samplepart2.STL";
+            //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
             //var filename = "../../../TestFiles/WEDGE.STL";
@@ -82,7 +82,7 @@ namespace TVGL_Test
             double[][] midarray = new double[3][];
             //Create flip matrices
             //examine in the x direction(identity matrix)
-            Presenter.ShowAndHang(solidOG);
+            //Presenter.ShowAndHang(solidOG);
             double[,] xFlipMatrix =
                 {
                 { 1, 0, 0, 0 },
@@ -246,7 +246,7 @@ namespace TVGL_Test
                         double val1 = valavg[m - 2];
                         double val2 = valavg[m - 1];
                         double val3 = deltaCavgval;
-                        if (val2 > (6 * val1) & val2 > (6 * val1))
+                        if (val2 > (3 * val1) & val2 > (3 * val1))
                         {
                             val2 = (val3 + val1) / 2;
 
@@ -258,7 +258,7 @@ namespace TVGL_Test
                         double val1m = valmax[m - 2];
                         double val2m = valmax[m - 1];
                         double val3m = deltaCmax;
-                        if (val2m > (6 * val1m) & val2m > (6 * val1m))
+                        if (val2m > (3 * val1m) & val2m > (3 * val1m))
                         {
                             val2m = (val3m + val1m) / 2;
 
@@ -296,37 +296,50 @@ namespace TVGL_Test
 
 
 
-                //scale data 0 to 1
-                var scale = valmax.Max();
-                for (var s=0; s<valmax.Count;s++)
-                {
-                    valmax[s] = valmax[s] / scale;
+                ////scale data 0 to 1
+                //var scale = valmax.Max();
+                //for (var s=0; s<valmax.Count;s++)
+                //{
+                //    valmax[s] = valmax[s] / scale;
 
-                }
+                //}
 
-                //scale data 0 to 1
-                var scale2 = valavg.Max();
-                for (var s2 = 0; s2 < valavg.Count; s2++)
-                {
-                    valavg[s2] = valmax[s2] / scale;
+                ////scale data 0 to 1
+                //var scale2 = valavg.Max();
+                //for (var s2 = 0; s2 < valavg.Count; s2++)
+                //{
+                //    valavg[s2] = valmax[s2] / scale;
 
-                }
+                //}
 
 
                 //save data to arrays
                 maxarray[dir] = valmax.ToArray();
-                //parray[dir] = valp.ToArray();
-                //narray[dir] = valn.normalize().ToArray();
                 avgarray[dir] = valavg.ToArray();
                 midarray[dir] = valxmid.ToArray();
                 valxmid.ForEach(Console.WriteLine);
                 valmax.ForEach(Console.WriteLine);
 
             }
-            
-            
-            
-            
+
+            //scale data 0 to 1 across arrays
+            //find max value of all directions
+            double[] maxes = new[] { maxarray[0].Max(), maxarray[1].Max(), maxarray[2].Max() };
+            double scale = maxes.Max();
+
+
+            for (var dir = 0; dir < 3; dir++)
+            {
+
+                for (var s = 0; s < maxarray[dir].Length; s++)
+                {
+                  
+                    maxarray[dir][ s] = maxarray[dir][s] / scale;
+
+                }
+
+            }
+
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;
             
