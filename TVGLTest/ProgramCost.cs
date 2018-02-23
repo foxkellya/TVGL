@@ -26,13 +26,15 @@ namespace TVGL_Test
 
             //pull shape files from folder and define
             //var filename = "../../../TestFiles/partsample.STL";
-            var filename = "../../../TestFiles/samplepart2.STL";
+            //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
             //var filename = "../../../TestFiles/Beam_Clean.STL";
             //var filename = "../../../TestFiles/WEDGE.STL";
             //var filename = "../../../TestFiles/Beam_Boss.STL";
             //var filename = "../../../TestFiles/testblock2.STL";
+            //var filename = "../../../TestFiles/sth2.STL";
+
 
 
             //open file with TessellatedSolid function
@@ -246,7 +248,7 @@ namespace TVGL_Test
                         double val1 = valavg[m - 2];
                         double val2 = valavg[m - 1];
                         double val3 = deltaCavgval;
-                        if (val2 > (3 * val1) & val2 > (3 * val1))
+                        if (val2 > (6 * val1) & val2 > (6 * val1))
                         {
                             val2 = (val3 + val1) / 2;
 
@@ -258,7 +260,7 @@ namespace TVGL_Test
                         double val1m = valmax[m - 2];
                         double val2m = valmax[m - 1];
                         double val3m = deltaCmax;
-                        if (val2m > (3 * val1m) & val2m > (3 * val1m))
+                        if (val2m > (6 * val1m) & val2m > (6 * val1m))
                         {
                             val2m = (val3m + val1m) / 2;
 
@@ -294,31 +296,11 @@ namespace TVGL_Test
 
 
 
-
-
-                ////scale data 0 to 1
-                //var scale = valmax.Max();
-                //for (var s=0; s<valmax.Count;s++)
-                //{
-                //    valmax[s] = valmax[s] / scale;
-
-                //}
-
-                ////scale data 0 to 1
-                //var scale2 = valavg.Max();
-                //for (var s2 = 0; s2 < valavg.Count; s2++)
-                //{
-                //    valavg[s2] = valmax[s2] / scale;
-
-                //}
-
-
                 //save data to arrays
                 maxarray[dir] = valmax.ToArray();
                 avgarray[dir] = valavg.ToArray();
                 midarray[dir] = valxmid.ToArray();
-                valxmid.ForEach(Console.WriteLine);
-                valmax.ForEach(Console.WriteLine);
+        
 
             }
 
@@ -335,10 +317,13 @@ namespace TVGL_Test
                 {
                   
                     maxarray[dir][ s] = maxarray[dir][s] / scale;
+              
 
                 }
-
+                midarray[dir].ToList().ForEach(Console.WriteLine);
+                maxarray[dir].ToList().ForEach(Console.WriteLine);
             }
+
 
             //I decided to make the max array, the cost array for this test, but note that all have been created
             costcoords = midarray;

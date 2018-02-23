@@ -835,6 +835,9 @@ namespace TVGL
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
         //complexify solid
             ts.Complexify();
+            ts.Complexify();
+            ts.Complexify();
+            
 
                 //new System.Windows.Media.Color
                 //{
