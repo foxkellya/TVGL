@@ -22,6 +22,7 @@ using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using OxyPlot;
 using System;
+using StarMathLib;
 
 namespace TVGL
 {
@@ -633,6 +634,7 @@ namespace TVGL
             window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
             window.ShowDialog();
         }
+
         /// <summary>
         /// Shows the and hang.
         /// </summary>
@@ -641,6 +643,17 @@ namespace TVGL
         {
             var window = new Window3DPlot();
             window.view1.Children.Add(MakeModelVisual3DHeatMap(tessellatedSolid, costxyz,costcoords,dx));
+            window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
+            window.ShowDialog();
+        }
+
+        /// <summary>
+        /// Shows the and hang.
+        /// </summary>
+        public static void ShowAndHangHeatMap(TessellatedSolid ts, Dictionary<double[], List<double[]>> values)
+        {
+            var window = new Window3DPlot();
+            window.view1.Children.Add(MakeModelVisual3DHeatMap(ts, values));
             window.view1.FitView(window.view1.Camera.LookDirection, window.view1.Camera.UpDirection);
             window.ShowDialog();
         }
@@ -825,6 +838,77 @@ namespace TVGL
             //brush.GradientStops.Add(new GradientStop(Colors.Black, 1.00));
             return brush;
         }
+
+        /// <summary>
+        /// Makes the model visual3 d.
+        /// </summary>
+        /// <param name="ts">The ts.</param>
+        /// <returns>Visual3D.</returns>
+        private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, Dictionary<double[], List<double[]>> values)
+        {
+            var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
+            ts.Complexify(5.0);
+            //var maxEdgeLength = ts.Edges.Max(e => e.Length);
+            
+            if (ts.HasUniformColor)
+            {
+                var positions =
+                    ts.Faces.SelectMany(
+                        f => f.Vertices.Select(v => new Point3D(v.Position[0], v.Position[1], v.Position[2])));
+                var normals =
+                    ts.Faces.SelectMany(f => f.Vertices.Select(v => new Vector3D(f.Normal[0], f.Normal[1], f.Normal[2])));
+                var texCoords = ts.Faces.SelectMany(
+                    f => f.Vertices.Select(v => new System.Windows.Point(CostPoint(v.Position, values), 0)));
+
+
+                return new ModelVisual3D
+                {
+                    Content =
+                        new GeometryModel3D
+                        {
+                            Geometry = new MeshGeometry3D
+                            {
+                                Positions = new Point3DCollection(positions),
+                                // TriangleIndices = new Int32Collection(triIndices),
+                                TextureCoordinates = new PointCollection(texCoords),
+                                Normals = new Vector3DCollection(normals)
+                            },
+                            Material = defaultMaterial
+
+                        }
+                };
+            }
+            var result = new ModelVisual3D();
+            foreach (var f in ts.Faces)
+            {
+                var vOrder = new Point3DCollection();
+                for (var i = 0; i < 3; i++)
+                    vOrder.Add(new Point3D(f.Vertices[i].X, f.Vertices[i].Y, f.Vertices[i].Z));
+
+                var c = f.Color == null
+                    ? defaultMaterial
+                    : MaterialHelper.CreateMaterial(new System.Windows.Media.Color
+                    {
+                        A = f.Color.A,
+                        B = f.Color.B,
+                        G = f.Color.G,
+                        R = f.Color.R
+
+                    });
+                result.Children.Add(new ModelVisual3D
+                {
+                    Content =
+                        new GeometryModel3D
+                        {
+                            Geometry = new MeshGeometry3D { Positions = vOrder },
+                            Material = c
+                        }
+                });
+            }
+            return result;
+        }
+
+
         /// <summary>
         /// Makes the model visual3 d.
         /// </summary>
@@ -833,22 +917,11 @@ namespace TVGL
         private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, double[][] costxyz, double[][]costcoords,double dx)
         {
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
-        //complexify solid
-            ts.Complexify();
-            ts.Complexify();
-            ts.Complexify();
-            
-
-                //new System.Windows.Media.Color
-                //{
-                //    A = ts.SolidColor.A,
-                //    B = ts.SolidColor.B,
-                //    G = ts.SolidColor.G,
-                //    R = ts.SolidColor.R
-                //});
+            //complexify solid
+            ts.Complexify(5.0);
+  
             if (ts.HasUniformColor)
             {
-                var random = new Random();
                 var positions =
                     ts.Faces.SelectMany(
                         f => f.Vertices.Select(v => new Point3D(v.Position[0], v.Position[1], v.Position[2])));
@@ -905,62 +978,97 @@ namespace TVGL
             return result;
         }
 
+        //Sets the objective function value for the vertex in question from our map of values
+        public static double CostPoint(double[] vertex, Dictionary<double[], List<double[]>> values)
+        {
+            var objFuncVals = new List<double>();
+
+            //for loop to find x,y,z cost directions of a single point
+            for (var i = 0; i < values.Count; i++)
+            {
+                var item = values.ElementAt(i);
+                var direction = item.Key;
+                var objVals = item.Value;
+                const int x = 0; //Index for x-values
+                const int y = 1; //Index for y-values
+                double objFuncVal;
+
+                var vertexDistanceAlong = direction.dotProduct(vertex);
+
+                //For the end points, extrapolate from the nearest point.
+                //For any point within the bounds, interpolate.
+                if (vertexDistanceAlong <= objVals.First()[x])
+                {
+                    objFuncVal = objVals.First()[y];
+                }
+                else if (vertexDistanceAlong > objVals.Last()[x])
+                {
+                    objFuncVal = objVals.Last()[y];
+                }
+                else
+                {
+                    var j = 0;
+                    while (vertexDistanceAlong > objVals[j][x])
+                    {
+                        j++;
+                    }
+                    var xmidlow = objVals[j - 1][x];
+                    var xmidhigh = objVals[j][x];
+
+                    //calculate for interpolation in the x points
+                    var interp = (vertexDistanceAlong - xmidlow) / (xmidhigh - xmidlow);
+
+                    //apply interpolation to find cost at that point for the different lists
+                    objFuncVal = interp * (objVals[j][y] - objVals[j - 1][y]) + objVals[j - 1][y];
+                }
+
+                //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
+                objFuncVals.Add(objFuncVal);
+            }
+
+            //return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
+            //return objFuncVals.Max();
+            return objFuncVals.Average();
+        }
+
         public static double CostPoint(double[] vertex, double[][] costxyz, double dx, double[][] costcoords)
         {
-
             //create array storage areas
-            double[] cvertex = new double[3];
-
+            var cvertex = new double[3];
 
             //for loop to find x,y,z cost directions of a single point
             for (var dir1 = 0; dir1 < 3; dir1++)
             {
-                //create places to store data
-                double cpv = new double();
+                double cpv;
 
-                //extrapolation case for end points
-                //for first points
-                if (vertex[dir1] <= (costcoords[dir1][0]))
+                //For the end points, extrapolate from the nearest point.
+                //For any point within the bounds, interpolate.
+                if (vertex[dir1] <= costcoords[dir1].First())
                 {
-                    cpv = costxyz[dir1][0];
-
-
+                    cpv = costxyz[dir1].First();
                 }
-             
-
-                //for end points
-                else if (vertex[dir1] > costcoords[dir1][costcoords[dir1].Length - 1])
+                else if (vertex[dir1] > costcoords[dir1].Last())
                 {
-                    cpv = costxyz[dir1][costxyz[dir1].Length - 1];
-
-
+                    cpv = costxyz[dir1].Last();
                 }
-                //interpolation case for mid points
                 else
                 {
-                    double midlow = new double();
+                    double midlow;
                     var lsearch = 0;
                     //find the low point
-                    if (vertex[dir1] < (costcoords[dir1][1]) & vertex[dir1] > (costcoords[dir1][0]))
+                    if (vertex[dir1] < costcoords[dir1][1] && vertex[dir1] > costcoords[dir1][0])
                     {
                         midlow = costcoords[dir1][0];
-
-
-                    }
-                     
-                    else
-                
+                    }  
+                    else         
                     {
-                       
-                        while ((vertex[dir1] - (costcoords[dir1][lsearch]) >= dx))
+                        while (vertex[dir1] - costcoords[dir1][lsearch] >= dx)
                         {
                             lsearch++;
                         }
                         midlow = costcoords[dir1][lsearch];
-
                     }
                     //add one step for the high point
-
                     var xmidhigh = costcoords[dir1][lsearch + 1];
 
                     //calculate for interpolation in the x points
@@ -968,39 +1076,18 @@ namespace TVGL
 
                     //apply interpolation to find cost at that point for the different lists
                     cpv = interp * (costxyz[dir1][lsearch + 1] - costxyz[dir1][lsearch]) + costxyz[dir1][lsearch];
-
-
-
-
                 }
-
-
 
                 //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
                 cvertex[dir1] = cpv;
-
-
-            
-
-
             }
             Console.WriteLine(cvertex[0]);
             Console.WriteLine(cvertex[1]);
             Console.WriteLine(cvertex[2]);
 
             //return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
-            return cvertex.Max();
-
-
-
-
-
-
+            return Enumerable.Max(cvertex);
         }
-
-
-
-
 
         /// <summary>
         /// Makes the model visual3 d.

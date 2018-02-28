@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using StarMathLib;
 using TVGL;
@@ -36,31 +38,132 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/sth2.STL";
 
 
+            var filename = "../../../TestFiles/Square_Support.STL";
+            //var filename = "../../../TestFiles/Aerospace_Beam.STL";
+            //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
+            //var filename = "../../../TestFiles/Bracket_Plate.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
-            List<TessellatedSolid> solids = IO.Open(filename);
-           
-
-
-
-
-
-
-            //define solid:assuming it's just one solid
-            var solidOG = solids[0];
+            var solid = IO.Open(filename)[0];
             
-            double[][] costxyz = new double[3][];
-            double[][] costcoords = new double[3][];
+            ////define cutting slice
+            //double dx = 1; //uniform length of square
+            //var costxyz = new double[3][];
+            //var costcoords = new double[3][];
+            //CostArrays(solid, dx, out costxyz, out costcoords);
+            //Presenter.ShowAndHangHeatMap(solid, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
 
-            //define cutting slice
-            double dx = 1; //uniform length of square
-
-            CostArrays(solidOG, dx, out costxyz, out costcoords);
-            Presenter.ShowAndHangHeatMap(solidOG, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
+            var averageNumSlices = 60; //could set with a dx value instead
+            var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices);
+            Presenter.ShowAndHangHeatMap(solid, values);
         }
 
+        public static Dictionary<double[], List<double[]>> SliceAndGetObjectiveFunctionValues(TessellatedSolid solid, int averageNumSlices)
+        {
+            //Intitialize output dictionary. First double[] is a direciton. 
+            //Second double[] is double[0] = distance along direction. double[1] = objective function value
+            var outputValues = new Dictionary<double[], List<double[]>>(); 
 
+            double[,] backTransform;
+            solid = solid.SetToOriginAndSquareTesselatedSolid(out backTransform);
+            var minBoundingBox = MinimumEnclosure.OrientedBoundingBox(solid);
+            // Do averageNumSlices slices for each direction on a box(l == w == h).
+            //Else, weight the averageNumSlices slices based on the average obb distance
+            var obbAverageLength = minBoundingBox.Dimensions.Average();
+            //Set step size to an even increment over the entire length of the solid
+            var dx = obbAverageLength / averageNumSlices;
+
+            foreach (var direction in minBoundingBox.Directions)
+            {
+                //Get all the distances along this direction, starting at minDistance + dx
+                //and ending at maxDistance - dx;
+                List<Vertex> bottomVertices, topVertices;
+                var length = MinimumEnclosure.GetLengthAndExtremeVertices(direction, solid.Vertices,
+                    out bottomVertices, out topVertices);
+                //var dx = length / averageNumSlices;
+                var minDistanceAlong = direction.dotProduct(bottomVertices[0].Position);
+                var maxDistanceAlong = direction.dotProduct(topVertices[0].Position);
+                var distanceAlong = minDistanceAlong + dx;
+                var distances = new List<double>();
+                while (!distanceAlong.IsPracticallySame(maxDistanceAlong, dx/2))
+                {
+                    distances.Add(distanceAlong);
+                    distanceAlong += dx;               
+                }
+
+                //Set up concurrent bags for use in the parallel loop.
+                //Since bags are unordered, we will need to sort these by double[0]
+                //when we convert the bags to lists.
+                var costsAlongDirection = new ConcurrentBag<double[]>();
+                var volumesAlongDirection = new ConcurrentBag<double[]>();
+                Parallel.ForEach(distances, d =>
+                {
+                    //Slice the solid and save its positive and negative side costs and volumes
+                    var posXsolids = new List<TessellatedSolid>();
+                    var negXsolids = new List<TessellatedSolid>();
+                    var flat = new Flat(d, direction);
+                    Slice.OnFlat(solid, flat, out posXsolids, out negXsolids);
+
+                    var negCost = GetCostModels.ForGivenBlankType(negXsolids, BlankType.RectangularBarStock);
+                    var posCost = GetCostModels.ForGivenBlankType(posXsolids, BlankType.RectangularBarStock);
+                    costsAlongDirection.Add(new []{d, negCost, posCost});
+
+                    var negVolume = posXsolids.Sum(s => s.Volume);
+                    var posVolume = posXsolids.Sum(s => s.Volume);
+                    volumesAlongDirection.Add(new[] {d, negVolume, posVolume});
+                });
+                var orderedCostsAlong = costsAlongDirection.OrderBy(s => s[0]).ToList();
+                var orderedVolumesAlong = volumesAlongDirection.OrderBy(s => s[0]).ToList();
+
+                //Set the objective function values for this direction
+                outputValues.Add(direction, ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, false));
+                //It is okay to mutated these costs and volumes lists, since they are not reference or used anywhere else
+                outputValues.Add(direction.multiply(-1), ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, true));
+            }
+
+            return outputValues;
+        }
+
+        public static List<double[]> ObjectiveFunction1(List<double[]> orderedCosts,
+            List<double[]> orderedVolumes, bool reverse)
+        {
+            const int d = 0; //distance index
+            const int n = 1; //neg value index
+            const int p = 2; //positive value index
+            var costs = new List<double[]>(orderedCosts);
+            var volumes = new List<double[]>(orderedVolumes);
+            var distances = orderedCosts.Select(s => s[0]).Reverse().ToList();
+            if (reverse) //If reversing, we just have to reorder the distances. 
+            {
+                for (var i = 0; i < costs.Count; i++)
+                {
+                    costs[i][d] = distances[i] * -1;
+                    volumes[i][d] = distances[i] * -1;
+                }
+            }
+
+            //y = Change in Cost / Change in volume
+            var output = new List<double[]>(); //where a double array contains: distance along (x) and cost (y)
+            var priorTotalCost = costs.First()[n] + costs.First()[p];
+            var priorTotalVolume = volumes.First()[n] + volumes.First()[p];
+            var priorDistance = costs.First()[d];
+            var count = costs.Count;
+            for (var i = 1; i < count; i++)
+            {
+                var currentTotalCost = costs[i][n] + costs[i][p];
+                var deltaCost = currentTotalCost - priorTotalCost;
+
+                var currentTotalVolume = volumes[i][n] + volumes[i][p];
+                var deltaVolume = currentTotalVolume - priorTotalVolume;
+                var y = deltaCost / deltaVolume;
+
+                var currentDistance = costs[i][d];
+                var x = (priorDistance + currentDistance) / 2;
+                output.Add(new []{x, y});
+            }
+            return output;
+        }
 
         public static void CostArrays(TessellatedSolid ts, double dx, out double[][] costxyz, out double[][] costcoords)
         {

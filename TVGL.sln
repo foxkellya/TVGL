@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVGLTest", "TVGLTest\TVGLTest.csproj", "{4425901E-ED04-45A8-B16E-C8EE7F9B95B6}"
 EndProject
@@ -109,8 +109,8 @@ Global
 		{D7B07B1E-E57B-4291-A918-19CA2C892CBB}.Release|x64.Build.0 = Release|x64
 		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|x64.ActiveCfg = Debug|x64
-		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|x64.Build.0 = Debug|x64
+		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Debug|x64.Build.0 = Debug|Any CPU
 		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
 		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{52C647A6-A05A-4CBD-A18A-9F1D260800F8}.Documentation|x64.ActiveCfg = Debug|x64
