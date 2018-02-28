@@ -45,7 +45,8 @@ namespace KatanaObjects.BaseClasses
         private readonly IList<Point> _projectedPoints;
         private readonly Lazy<IList<List<Point>>> _silhouetteWithShortDimensionOBB;
         private readonly Length _subvolumeDepthAlongPlaneNormal;
-        
+        private readonly TessellatedSolid OriginalSolid;
+
         //Additive 
         private List<DirectionalDecomposition.DecompositionData> _additiveDecompositionData;
         private double[] _additiveBuildDirection;
@@ -498,7 +499,7 @@ namespace KatanaObjects.BaseClasses
         #endregion
 
         #region Constructor
-        public SubVolume(TessellatedSolid solid, ISet<BlankType> blankTypes, 
+        public SubVolume(TessellatedSolid originalSolid, TessellatedSolid solid, ISet<BlankType> blankTypes, 
             SearchInputs searchInputs)
         {
             //Initialize some public parameters
@@ -506,6 +507,7 @@ namespace KatanaObjects.BaseClasses
             CircularBarIsFeasible = true;
             ForgingIsFeasible = true;
             NearNetPrintedShapeIsFeasible = true;
+            OriginalSolid = originalSolid;
 
             SolidUnitString = solid.Units.ToString();
             Solid = solid;
@@ -1227,17 +1229,22 @@ namespace KatanaObjects.BaseClasses
             {
                 var direction = sortedDirections[i];
                 var draftAngle = _searchInputs.Forging.DraftAngle.Radians;
-                var topCover = _searchInputs.Forging.TopCover.TesselatedSolidBaseUnit(SolidUnitString);
-                var sideCover = _searchInputs.Forging.SideCover.TesselatedSolidBaseUnit(SolidUnitString);
            
                 List<Vertex> v1, v2;
                 var length = MinimumEnclosure.GetLengthAndExtremeVertices(direction, Solid.Vertices, out v1, out v2);
+                var originalLength = MinimumEnclosure.GetLengthAndExtremeVertices(direction, OriginalSolid.Vertices, out v1, out v2);
+
+                var topCover = Math.Max(_searchInputs.Forging.TopCover.TesselatedSolidBaseUnit(SolidUnitString) * (length / originalLength), 0.01 * length);
+                var sideCover = Math.Max(_searchInputs.Forging.SideCover.TesselatedSolidBaseUnit(SolidUnitString) * (length / originalLength), 0.01 * length);
+
                 //This sets a minimum size forging. It must be at least 2x the top cover dimension
-                if (length < 2*_searchInputs.Forging.TopCover.TesselatedSolidBaseUnit(SolidUnitString)) continue;
-                var stepSize = length/_searchInputs.Forging.NumberOfSlices.Unitless;
+                if (length < 2 * topCover) continue;
+                //Set the step size according the current lenght, with a min number of slice = 10.
+                var numSlices = (int)Math.Max(_searchInputs.Forging.NumberOfSlices.Unitless * length / originalLength, 10);
+                var stepSize = length / numSlices;
                  
                 var originalDecompositionData = DirectionalDecomposition.UniformAreaDecomposition(Solid, direction, stepSize);
-                if(originalDecompositionData.Count < _searchInputs.Forging.NumberOfSlices.Unitless) Debug.WriteLine("Forging step size is too large or part is too small.");
+                if(originalDecompositionData.Count < numSlices) Debug.WriteLine("Forging step size is too large or part is too small.");
             
                 if (!originalDecompositionData.Any())
                 {

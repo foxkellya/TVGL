@@ -22,7 +22,7 @@ namespace CostModelCalculator
 
         }
 
-        public static double ForAllBlankTypes(TessellatedSolid ts)
+        public static double ForAllBlankTypes(TessellatedSolid originalSolid, TessellatedSolid ts)
         {
             ts.Units = UnitType.millimeter; //Guess
 
@@ -36,7 +36,7 @@ namespace CostModelCalculator
             var costFactory = new CostModelFactory(searchInputs);
 
             //Get the stock volume information for every type of Blank
-            var subvolume = new SubVolume(ts, blankTypes, searchInputs);
+            var subvolume = new SubVolume(originalSolid, ts, blankTypes, searchInputs);
 
             //Current Blank Type Settings:
             //Forging is currently only considering one direction. This value is set in
@@ -59,12 +59,12 @@ namespace CostModelCalculator
             return minCost.Dollars;
         }
 
-        public static double ForGivenBlankType(List<TessellatedSolid> solids, BlankType blankType)
+        public static double ForGivenBlankType(TessellatedSolid originalSolid, List<TessellatedSolid> solids, BlankType blankType)
         {
-            return solids.Sum(solid => ForGivenBlankType(solid, blankType));
+            return solids.Sum(solid => ForGivenBlankType(originalSolid, solid, blankType));
         }
 
-        public static double ForGivenBlankType(TessellatedSolid ts, BlankType blankType)
+        public static double ForGivenBlankType(TessellatedSolid originalSolid, TessellatedSolid ts, BlankType blankType)
         {
             ts.Units = UnitType.millimeter; //Guess
 
@@ -73,7 +73,7 @@ namespace CostModelCalculator
             var costFactory = new CostModelFactory(searchInputs);
 
             //Get the stock volume information for every type of Blank
-            var subvolume = new SubVolume(ts, new HashSet<BlankType> { blankType}, searchInputs);
+            var subvolume = new SubVolume(originalSolid, ts, new HashSet<BlankType> { blankType}, searchInputs);
 
             //Current Blank Type Settings:
             //Forging is currently only considering one direction. This value is set in

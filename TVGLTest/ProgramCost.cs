@@ -105,9 +105,9 @@ namespace TVGL_Test
                     var flat = new Flat(d, direction);
                     Slice.OnFlat(solid, flat, out posXsolids, out negXsolids);
 
-                    var negCost = GetCostModels.ForGivenBlankType(negXsolids, BlankType.RectangularBarStock);
-                    var posCost = GetCostModels.ForGivenBlankType(posXsolids, BlankType.RectangularBarStock);
-                    costsAlongDirection.Add(new []{d, negCost, posCost});
+                    var negCost = GetCostModels.ForGivenBlankType(solid, negXsolids, BlankType.ClosedDieForging);
+                    var posCost = GetCostModels.ForGivenBlankType(solid, posXsolids, BlankType.ClosedDieForging);
+                    costsAlongDirection.Add(new[] {d, negCost, posCost});
 
                     var negVolume = posXsolids.Sum(s => s.Volume);
                     var posVolume = posXsolids.Sum(s => s.Volume);
@@ -116,9 +116,8 @@ namespace TVGL_Test
                 var orderedCostsAlong = costsAlongDirection.OrderBy(s => s[0]).ToList();
                 var orderedVolumesAlong = volumesAlongDirection.OrderBy(s => s[0]).ToList();
 
-                //Set the objective function values for this direction
+                //Set the objective function values for this direction and its reverse
                 outputValues.Add(direction, ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, false));
-                //It is okay to mutated these costs and volumes lists, since they are not reference or used anywhere else
                 outputValues.Add(direction.multiply(-1), ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, true));
             }
 
@@ -292,7 +291,7 @@ namespace TVGL_Test
                     //get cost of solids after solving and save them
                     foreach (TessellatedSolid posXsolid in posXsolids)
                     {
-                        double C1 = GetCostModels.ForGivenBlankType(posXsolid, BlankType.RectangularBarStock);
+                        double C1 = GetCostModels.ForGivenBlankType(solid1, posXsolid, BlankType.RectangularBarStock);
                         Cptot.Add(C1);
                         Vptot.Add(Math.Abs(posXsolid.Volume));
 
@@ -301,7 +300,7 @@ namespace TVGL_Test
                     Vplist.Add(Vptot.Sum());
                     foreach (TessellatedSolid negXsolid in negXsolids)
                     {
-                        double C1 = GetCostModels.ForGivenBlankType(negXsolid, BlankType.RectangularBarStock);
+                        double C1 = GetCostModels.ForGivenBlankType(solid1, negXsolid, BlankType.RectangularBarStock);
                         Cntot.Add(C1);
                         Vntot.Add(Math.Abs(negXsolid.Volume));
 
