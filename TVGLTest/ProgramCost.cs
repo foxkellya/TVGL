@@ -31,7 +31,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/samplepart2.STL";
             //var filename = "../../../TestFiles/samplepart4.STL";
             //var filename = "../../../TestFiles/cuboide.STL";
-            //var filename = "../../../TestFiles/Beam_Clean.STL";
+            //var filename = "../../../TestFiles/Beam_Clean.STL"; //throws an error in 2D convex hull
             //var filename = "../../../TestFiles/WEDGE.STL";
             //var filename = "../../../TestFiles/Beam_Boss.STL";
             //var filename = "../../../TestFiles/testblock2.STL";
@@ -47,13 +47,15 @@ namespace TVGL_Test
             Console.WriteLine("Attempting: " + filename);
             var solid = IO.Open(filename)[0];
             
-            ////define cutting slice
+            //////define cutting slice
             //double dx = 1; //uniform length of square
             //var costxyz = new double[3][];
             //var costcoords = new double[3][];
             //CostArrays(solid, dx, out costxyz, out costcoords);
             //Presenter.ShowAndHangHeatMap(solid, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
-
+            
+            
+            //solid = IO.Open(filename)[0];
             var averageNumSlices = 60; //could set with a dx value instead
             var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices);
             Presenter.ShowAndHangHeatMap(solid, values);
@@ -110,19 +112,19 @@ namespace TVGL_Test
                 //{
                     Parallel.ForEach(distances, d =>
                     {
-                    //Slice the solid and save its positive and negative side costs and volumes
-                    var posXsolids = new List<TessellatedSolid>();
-                    var negXsolids = new List<TessellatedSolid>();
-                    var flat = new Flat(d, direction);
-                    Slice.OnFlat(solid, flat, out posXsolids, out negXsolids);
+                        //Slice the solid and save its positive and negative side costs and volumes
+                        var posXsolids = new List<TessellatedSolid>();
+                        var negXsolids = new List<TessellatedSolid>();
+                        var flat = new Flat(d, direction);
+                        Slice.OnFlat(solid, flat, out posXsolids, out negXsolids);
 
-                    var negCost = GetCostModels.ForGivenBlankType(solid, negXsolids, blankType);
-                    var posCost = GetCostModels.ForGivenBlankType(solid, posXsolids, blankType);
-                    costsAlongDirection.Add(new[] {d, negCost, posCost});
+                        var negCost = GetCostModels.ForGivenBlankType(solid, negXsolids, blankType);
+                        var posCost = GetCostModels.ForGivenBlankType(solid, posXsolids, blankType);
+                        costsAlongDirection.Add(new[] {d, negCost, posCost});
 
-                    var negVolume = negXsolids.Sum(s => s.Volume);
-                    var posVolume = posXsolids.Sum(s => s.Volume);
-                    volumesAlongDirection.Add(new[] {d, negVolume, posVolume});
+                        var negVolume = negXsolids.Sum(s => s.Volume);
+                        var posVolume = posXsolids.Sum(s => s.Volume);
+                        volumesAlongDirection.Add(new[] {d, negVolume, posVolume});
                     });
                 //}
 
@@ -166,8 +168,7 @@ namespace TVGL_Test
                 var deltaPCost = costs[i - 1][p] - costs[i][p];
                 var deltaNVolume = volumes[i][n] - volumes[i - 1][n];
                 var deltaPVolume = volumes[i - 1][p] - volumes[i][p];
-                // var y = ((deltaNCost / deltaNVolume) + (deltaPCost / deltaPVolume)) / 2; //average change
-                var y = (deltaNCost + deltaPCost) / (deltaNVolume + deltaPVolume); //average change
+                var y = ((deltaNCost / deltaNVolume) + (deltaPCost / deltaPVolume)) / 2; //average change
 
                 var currentDistance = costs[i][d];
                 var x = (priorDistance + currentDistance) / 2;
@@ -239,9 +240,9 @@ namespace TVGL_Test
                 double y;
                 if (costs[i][n] < costs[i][p])
                 {
-                    y = (costs[i][n] / originalCost) / (volumes[i][n] / originalVolume);
+                    y = ((originalCost - costs[i][n]) / originalCost) / (volumes[i][n] / originalVolume);
                 }
-                else y = (costs[i][p] / originalCost) / (volumes[i][p] / originalVolume);
+                else y = ((originalCost - costs[i][p]) / originalCost) / (volumes[i][p] / originalVolume);
             var x = costs[i][d];
                 output.Add(new[] { x, y });
             }
