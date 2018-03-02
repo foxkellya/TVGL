@@ -38,16 +38,16 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/sth2.STL";
 
             //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
-            var filename = "../../../TestFiles/Square_Support.STL";
+            //var filename = "../../../TestFiles/Square_Support.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
-            //var filename = "../../../TestFiles/Bracket_Plate.STL";
+            var filename = "../../../TestFiles/Bracket_Plate.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
             var solid = IO.Open(filename)[0];
-            var blankType = BlankType.RectangularBarStock;
-            //var blankType = BlankType.ClosedDieForging;
+            //var blankType = BlankType.RectangularBarStock;
+            var blankType = BlankType.ClosedDieForging;
 
             ////////define cutting slice
             //double dx = 1; //uniform length of square
@@ -138,7 +138,7 @@ namespace TVGL_Test
                 //outputValues.Add(direction, ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, false));
                 //outputValues.Add(direction.multiply(-1), ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, true));
 
-                outputValues.Add(direction, ObjectiveFunction4(originalCost, originalVolume, orderedCostsAlong, orderedVolumesAlong));
+                outputValues.Add(direction, ObjectiveFunction3(originalCost, originalVolume, orderedCostsAlong, orderedVolumesAlong));
             }
 
             //NormalizeValues(outputValues); // not necessary
@@ -249,30 +249,6 @@ namespace TVGL_Test
         }
 
         public static List<double[]> ObjectiveFunction3(double originalCost, double originalVolume, List<double[]> orderedCosts,
-            List<double[]> orderedVolumes)
-        {
-            const int d = 0; //distance index
-            const int n = 1; //neg value index
-            const int p = 2; //positive value index
-            var costs = orderedCosts;
-            var volumes = orderedVolumes;
-
-            var output = new List<double[]>(); //where a double array contains: distance along (x) and cost (y)
-            for (var i = 0; i < costs.Count; i++)
-            {
-                double y;
-                if (costs[i][n] < costs[i][p])
-                {
-                    y = (originalCost - costs[i][p]) / volumes[i][n];
-                }
-                else y = (originalCost - costs[i][n]) / volumes[i][p];
-                var x = costs[i][d];
-                output.Add(new[] { x, y });
-            }
-            return output;
-        }
-
-        public static List<double[]> ObjectiveFunction4(double originalCost, double originalVolume, List<double[]> orderedCosts,  
             List<double[]> orderedVolumes)
         {
             const int d = 0; //distance index

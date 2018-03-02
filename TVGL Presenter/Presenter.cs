@@ -1020,7 +1020,7 @@ namespace TVGL
                     var interp = (vertexDistanceAlong - xmidlow) / (xmidhigh - xmidlow);
                     objFuncVal = interp * (objVals[j][y] - objVals[j - 1][y]) + objVals[j - 1][y];
 
-                    objFuncVal = Math.Min(objVals[j][y], objVals[j - 1][y]);
+                    //objFuncVal = Math.Min(objVals[j][y], objVals[j - 1][y]);
                 }
 
                 //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
