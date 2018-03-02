@@ -845,7 +845,7 @@ namespace TVGL
         /// <param name="ts">The ts.</param>
         /// <returns>Visual3D.</returns>
         private static Visual3D MakeModelVisual3DHeatMap(TessellatedSolid ts, Dictionary<double[], List<double[]>> values)
-        {
+        {           
             var defaultMaterial = MaterialHelper.CreateMaterial(CreateRainbowBrush());
             ts.Complexify(5.0);
             //var maxEdgeLength = ts.Edges.Max(e => e.Length);
@@ -1012,21 +1012,21 @@ namespace TVGL
                     {
                         j++;
                     }
-                    var xmidlow = objVals[j - 1][x];
-                    var xmidhigh = objVals[j][x];
 
                     //calculate for interpolation in the x points
+                    //apply interpolation to find cost at that point for the different lists 
+                    var xmidlow = objVals[j - 1][x];
+                    var xmidhigh = objVals[j][x];
                     var interp = (vertexDistanceAlong - xmidlow) / (xmidhigh - xmidlow);
-
-                    //apply interpolation to find cost at that point for the different lists
                     objFuncVal = interp * (objVals[j][y] - objVals[j - 1][y]) + objVals[j - 1][y];
+
+                    objFuncVal = Math.Min(objVals[j][y], objVals[j - 1][y]);
                 }
 
                 //save this cool stuff to an array:cost from positive, cost from negative, cost of average, cost of max in x,y,z directions
                 objFuncVals.Add(objFuncVal);
             }
 
-            //return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
             //return objFuncVals.Max();
             return objFuncVals.Average();
         }
@@ -1086,7 +1086,7 @@ namespace TVGL
             Console.WriteLine(cvertex[2]);
 
             //return (cvertex[0] + cvertex[1] + cvertex[2]) / 3;
-            return Enumerable.Max(cvertex);
+            return Enumerable.Average(cvertex);
         }
 
         /// <summary>

@@ -37,7 +37,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/testblock2.STL";
             //var filename = "../../../TestFiles/sth2.STL";
 
-
+            //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
             var filename = "../../../TestFiles/Square_Support.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
@@ -46,28 +46,35 @@ namespace TVGL_Test
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
             var solid = IO.Open(filename)[0];
-            
-            //////define cutting slice
+            var blankType = BlankType.RectangularBarStock;
+            //var blankType = BlankType.ClosedDieForging;
+
+            ////////define cutting slice
             //double dx = 1; //uniform length of square
             //var costxyz = new double[3][];
             //var costcoords = new double[3][];
-            //CostArrays(solid, dx, out costxyz, out costcoords);
+            //CostArrays(solid, blankType, dx, out costxyz, out costcoords);
             //Presenter.ShowAndHangHeatMap(solid, costxyz, costcoords, dx);//goal/final result:cool heat map with vertices!
-            
-            
+
+
             //solid = IO.Open(filename)[0];
             var averageNumSlices = 60; //could set with a dx value instead
-            var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices);
+            var enforceBuildDirection = true;
+            var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices, blankType, enforceBuildDirection);
             Presenter.ShowAndHangHeatMap(solid, values);
         }
 
-        public static Dictionary<double[], List<double[]>> SliceAndGetObjectiveFunctionValues(TessellatedSolid solid, int averageNumSlices)
+        public static Dictionary<double[], List<double[]>> SliceAndGetObjectiveFunctionValues(TessellatedSolid solid, 
+            int averageNumSlices, BlankType blankType, bool enforceBuildDirection)
         {
             //Intitialize output dictionary. First double[] is a direciton. 
             //Second double[] is double[0] = distance along direction. double[1] = objective function value
             var outputValues = new Dictionary<double[], List<double[]>>();
-            var blankType = BlankType.RectangularBarStock;
-            var originalCost = GetCostModels.ForGivenBlankType(solid, solid, blankType);
+            double[] originalBuildDirection;
+            var originalCost = GetCostModels.ForGivenBlankType(solid, solid, blankType, out originalBuildDirection);
+            //Setting to null allows forging to consider 3 directions, not just the original build direction. However,
+            //it may be preferable to enforce the build direction to get a better idea of feature effect on cost. 
+            if (!enforceBuildDirection) originalBuildDirection = null; 
             var originalVolume = solid.Volume;
 
             double[,] backTransform;
@@ -79,14 +86,10 @@ namespace TVGL_Test
             //Set step size to an even increment over the entire length of the solid
             var dx = obbAverageLength / averageNumSlices;
 
-            //var directions = new double[3][]
-            //{
-            //    new[] {1.0, 0, 0},
-            //    new[] {0, 1.0, 0},
-            //    new[] {0, 0, 1.0}
-            //};
             foreach (var direction in minBoundingBox.Directions)
             {
+                //var direction = minBoundingBox.Directions.Last(); //debugging
+
                 //Get all the distances along this direction, starting at minDistance + dx
                 //and ending at maxDistance - dx;
                 List<Vertex> bottomVertices, topVertices;
@@ -111,21 +114,21 @@ namespace TVGL_Test
                 //foreach (var d in distances)
                 //{
                     Parallel.ForEach(distances, d =>
-                    {
-                        //Slice the solid and save its positive and negative side costs and volumes
-                        var posXsolids = new List<TessellatedSolid>();
+                {
+                    //Slice the solid and save its positive and negative side costs and volumes
+                    var posXsolids = new List<TessellatedSolid>();
                         var negXsolids = new List<TessellatedSolid>();
                         var flat = new Flat(d, direction);
                         Slice.OnFlat(solid, flat, out posXsolids, out negXsolids);
 
-                        var negCost = GetCostModels.ForGivenBlankType(solid, negXsolids, blankType);
-                        var posCost = GetCostModels.ForGivenBlankType(solid, posXsolids, blankType);
+                        var negCost = GetCostModels.ForGivenBlankType(solid, negXsolids, blankType, originalBuildDirection);
+                        var posCost = GetCostModels.ForGivenBlankType(solid, posXsolids, blankType, originalBuildDirection);
                         costsAlongDirection.Add(new[] {d, negCost, posCost});
 
                         var negVolume = negXsolids.Sum(s => s.Volume);
                         var posVolume = posXsolids.Sum(s => s.Volume);
                         volumesAlongDirection.Add(new[] {d, negVolume, posVolume});
-                    });
+                });
                 //}
 
                 var orderedCostsAlong = costsAlongDirection.OrderBy(s => s[0]).ToList();
@@ -135,10 +138,54 @@ namespace TVGL_Test
                 //outputValues.Add(direction, ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, false));
                 //outputValues.Add(direction.multiply(-1), ObjectiveFunction1(orderedCostsAlong, orderedVolumesAlong, true));
 
-                outputValues.Add(direction, ObjectiveFunction2(originalCost, originalVolume, orderedCostsAlong, orderedVolumesAlong));
+                outputValues.Add(direction, ObjectiveFunction4(originalCost, originalVolume, orderedCostsAlong, orderedVolumesAlong));
             }
 
+            //NormalizeValues(outputValues); // not necessary
+            foreach (var dir in outputValues)
+            {
+                var points = dir.Value.Select(pair => new Point(pair[0], pair[1])).ToList();
+                Presenter.ShowAndHang(points, "Direction: <" + Math.Round(dir.Key[0],2) + "," + Math.Round(dir.Key[1], 2) + "," + Math.Round(dir.Key[2], 2) + ">", Plot2DType.Points, false);
+            }
             return outputValues;
+        }
+
+        private static void NormalizeValues(Dictionary<double[], List<double[]>> values)
+        {
+            ////Now, scale all the values between 0 and 1
+            //for (var i = 0; i < values.Count; i++)
+            //{
+            //    const int y = 1; //Index for y-values
+            //    foreach (var valuePair in values.ElementAt(i).Value)
+            //    {
+            //        valuePair[y] = Math.Pow(valuePair[y], 0.1);
+            //    }
+            //}
+
+            //Scales the values from 0 to 1
+            //scale data 0 to 1 across arrays
+            //find max value of all directions
+            var maxVal = double.MinValue;
+            var minVal = double.MaxValue;
+            for (var i = 0; i < values.Count; i++)
+            {
+                const int y = 1; //Index for y-values
+                foreach (var valuePair in values.ElementAt(i).Value)
+                {
+                    if (valuePair[y] < minVal) minVal = valuePair[y];
+                    if (valuePair[y] > maxVal) maxVal = valuePair[y];
+                }
+            }
+            var scale = maxVal - minVal;
+            //Now, scale all the values between 0 and 1
+            for (var i = 0; i < values.Count; i++)
+            {
+                const int y = 1; //Index for y-values
+                foreach (var valuePair in values.ElementAt(i).Value)
+                {
+                    valuePair[y] = (valuePair[y] - minVal) / scale;
+                }
+            }
         }
 
         public static List<double[]> ObjectiveFunction1(List<double[]> orderedCosts,
@@ -240,22 +287,22 @@ namespace TVGL_Test
                 double y;
                 if (costs[i][n] < costs[i][p])
                 {
-                    y = ((originalCost - costs[i][n]) / originalCost) / (volumes[i][n] / originalVolume);
+                    y = (originalCost - costs[i][p]) / volumes[i][n];
                 }
-                else y = ((originalCost - costs[i][p]) / originalCost) / (volumes[i][p] / originalVolume);
-            var x = costs[i][d];
+                else y = (originalCost - costs[i][n]) / volumes[i][p];
+                var x = costs[i][d];
                 output.Add(new[] { x, y });
             }
             return output;
         }
 
-        public static void CostArrays(TessellatedSolid ts, double dx, out double[][] costxyz, out double[][] costcoords)
+        public static void CostArrays(TessellatedSolid ts, BlankType blankType, double dx, 
+            out double[][] costxyz, out double[][] costcoords)
         {
 
             //define solid
             var solidOG = ts;
             double[,] backTransform;
-
 
 
             //create list of flip matrices to transform the solid in the x,y,z directions
@@ -376,7 +423,7 @@ namespace TVGL_Test
                     //get cost of solids after solving and save them
                     foreach (TessellatedSolid posXsolid in posXsolids)
                     {
-                        double C1 = GetCostModels.ForGivenBlankType(solid1, posXsolid, BlankType.RectangularBarStock);
+                        double C1 = GetCostModels.ForGivenBlankType(solid1, posXsolid, blankType, null);
                         Cptot.Add(C1);
                         Vptot.Add(Math.Abs(posXsolid.Volume));
 
@@ -385,7 +432,7 @@ namespace TVGL_Test
                     Vplist.Add(Vptot.Sum());
                     foreach (TessellatedSolid negXsolid in negXsolids)
                     {
-                        double C1 = GetCostModels.ForGivenBlankType(solid1, negXsolid, BlankType.RectangularBarStock);
+                        double C1 = GetCostModels.ForGivenBlankType(solid1, negXsolid, blankType, null);
                         Cntot.Add(C1);
                         Vntot.Add(Math.Abs(negXsolid.Volume));
 

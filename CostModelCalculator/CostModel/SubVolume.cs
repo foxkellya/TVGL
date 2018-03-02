@@ -260,6 +260,8 @@ namespace KatanaObjects.BaseClasses
         //public List<TessellatedSolid> ForgingStockSolid => _forgingStockSolid.Value; 
         //Rather than using lazy, don't save the stock solid.
         public TessellatedSolid ForgingStockSolid => GetForgingStockSolid();
+
+        public double[] ForgingStrokeDirection => _forgingStrokeDirection;
         #endregion
 
         #region Circular Bar Stock
@@ -500,7 +502,7 @@ namespace KatanaObjects.BaseClasses
 
         #region Constructor
         public SubVolume(TessellatedSolid originalSolid, TessellatedSolid solid, ISet<BlankType> blankTypes, 
-            SearchInputs searchInputs)
+            SearchInputs searchInputs, double[] buildDirection)
         {
             //Initialize some public parameters
             AdditiveIsFeasible = true;
@@ -554,7 +556,8 @@ namespace KatanaObjects.BaseClasses
             //Forging
             if (blankTypes.Contains(BlankType.ClosedDieForging))
             {
-                _forgingVolume = GetForgingVolume();
+                if (buildDirection == null) _forgingVolume = GetForgingVolume();
+                else _forgingVolume = GetForgingVolume(new List<double[]>{buildDirection});
                 //Forgin cross sections are not set to lower memory because they are not needed in all cases.
                 _forgingCrossSections = new Lazy<List<List<List<double[]>>>>(GetForgingCrossSections);
                 //Tesselated Solids are not set to lower memory because they are not needed in all cases.
@@ -581,6 +584,7 @@ namespace KatanaObjects.BaseClasses
             //Rectangular Blanks
             if (blankTypes.Contains(BlankType.RectangularBarStock))
             {
+                //Build direction does not really affect rectangular bar stock
                 SetAllRectangularBlankDimensions();
                 RectangularBlankVolume = GetRectangularBlankVolume();
                 RectangularBlankAreaOnPlane = GetRectangularBlankAreaOnPlane();
@@ -1219,28 +1223,36 @@ namespace KatanaObjects.BaseClasses
         #endregion
 
         #region Forging
+
         private Volume GetForgingVolume()
         {
-            var minForgingVolume = Volume.MaxValue;
-            var numDirections = _searchInputs.Forging.NumberOfOBBDirectionsToConsider.Value;
+            var numDirections = (int)_searchInputs.Forging.NumberOfOBBDirectionsToConsider.Value;
             //Get the 3 directions we are interested in.
             var sortedDirections = SortedOBBDirectionsByLength;
-            for (var i = 0; i < numDirections; i++)
+            return GetForgingVolume(sortedDirections.Take(numDirections));
+        }
+
+
+        private Volume GetForgingVolume(IEnumerable<double[]> buildDirections)
+        {
+            var minForgingVolume = Volume.MaxValue;
+            foreach (var direction in buildDirections) //(var i = 0; i < numDirections; i++)
             {
-                var direction = sortedDirections[i];
+                //var direction = buildDirections[i];
                 var draftAngle = _searchInputs.Forging.DraftAngle.Radians;
            
                 List<Vertex> v1, v2;
                 var length = MinimumEnclosure.GetLengthAndExtremeVertices(direction, Solid.Vertices, out v1, out v2);
                 var originalLength = MinimumEnclosure.GetLengthAndExtremeVertices(direction, OriginalSolid.Vertices, out v1, out v2);
+                var scale = length / originalLength;
 
-                var topCover = Math.Max(_searchInputs.Forging.TopCover.TesselatedSolidBaseUnit(SolidUnitString) * (length / originalLength), 0.01 * length);
-                var sideCover = Math.Max(_searchInputs.Forging.SideCover.TesselatedSolidBaseUnit(SolidUnitString) * (length / originalLength), 0.01 * length);
+                var topCover = _searchInputs.Forging.TopCover.TesselatedSolidBaseUnit(SolidUnitString) * scale;
+                var sideCover = _searchInputs.Forging.SideCover.TesselatedSolidBaseUnit(SolidUnitString) * scale;
 
                 //This sets a minimum size forging. It must be at least 2x the top cover dimension
                 if (length < 2 * topCover) continue;
-                //Set the step size according the current lenght, with a min number of slice = 10.
-                var numSlices = (int)Math.Max(_searchInputs.Forging.NumberOfSlices.Unitless * length / originalLength, 10);
+                //Set the step size according the current lenght, with a min number of slice = 5.
+                var numSlices = Math.Round(Math.Max(_searchInputs.Forging.NumberOfSlices.Unitless * scale, 5));
                 var stepSize = length / numSlices;
                  
                 var originalDecompositionData = DirectionalDecomposition.UniformAreaDecomposition(Solid, direction, stepSize);
@@ -1458,8 +1470,8 @@ namespace KatanaObjects.BaseClasses
             if (minForgingVolume >= SolidVolume) return minForgingVolume;
             if (minForgingVolume < SolidVolume * .95)
             {
-                ShowForgingBlank();
-                throw new Exception(
+                //ShowForgingBlank();
+                Debug.WriteLine(
                     "Error in implemenation. Stock volume should always be larger than the final volume.");
             }
 
