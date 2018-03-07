@@ -107,6 +107,10 @@ namespace CostModelCalculator
             {
                 buildDirection = subvolume.RectangularBlankCrossSectionBuildDirection;
             }
+            else if (blankType == BlankType.NearNetAdditive)
+            {
+                buildDirection = subvolume.AdditiveBuildDirection;
+            }
             else throw new NotImplementedException();
 
             return cost.Dollars;

@@ -504,6 +504,7 @@ namespace KatanaObjects.BaseClasses
         public SubVolume(TessellatedSolid originalSolid, TessellatedSolid solid, ISet<BlankType> blankTypes, 
             SearchInputs searchInputs, double[] buildDirection)
         {
+            //if(buildDirection != null) Flat = new Flat(new []{0.0, 0.0, 0.0}, buildDirection);
             //Initialize some public parameters
             AdditiveIsFeasible = true;
             CircularBarIsFeasible = true;
@@ -535,8 +536,9 @@ namespace KatanaObjects.BaseClasses
             //the seed we are actually considering additive feedstock.
             if (blankTypes.Contains(BlankType.NearNetAdditive))
             {
+                if (buildDirection == null) AdditiveVolume = GetAdditiveVolume();
+                else AdditiveVolume = GetAdditiveVolume(new List<double[]> { buildDirection, buildDirection.multiply(-1)});
                 AdditiveShapeOnPlane = GetAdditiveSilhouette();
-                AdditiveVolume = GetAdditiveVolume();
                 AdditiveAreaOnPlane = GetAdditiveAreaOnPlane();
                 AdditivePerimeterOnPlane = GetAdditivePerimeterOnPlane();
                 //Additive cross sections are not set to lower memory because they are not needed in all cases.
@@ -1751,16 +1753,8 @@ namespace KatanaObjects.BaseClasses
         #region Additive
         private IList<List<Point>> GetAdditiveSilhouette()
         {
-            if (Flat != null)
-            {
-                return PolygonOperations.OffsetRound(_silhouetteAlongNormal,
-                    _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString));
-            }
-
-            //The normal had not been defined. Get the silhouette along the smallest OBB direciton
-            //ToDo: Getting the best direction is more complicated than this.
-            return PolygonOperations.OffsetRound(_silhouetteWithShortDimensionOBB.Value,
-                _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString));
+            return PolygonOperations.OffsetRound(GetSilhouette(_additiveBuildDirection),
+                _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString));          
         }
 
         private Length GetAdditivePerimeterOnPlane()
@@ -1787,9 +1781,13 @@ namespace KatanaObjects.BaseClasses
             //The normal had not been defined. Get the volume along the smallest OBB direciton
             //Also try the reverse direction.
             var buildDirection = OBBSmallestNormal;
-            directions.Add(buildDirection); 
+            directions.Add(buildDirection);
             directions.Add(buildDirection.multiply(-1));
-                     
+            return GetAdditiveVolume(directions);
+        }
+
+        private Volume GetAdditiveVolume(List<double[]> directions)
+        {
             var minAdditiveVolume = double.MaxValue;
             var additiveOutputData = new List<DirectionalDecomposition.DecompositionData>();
 

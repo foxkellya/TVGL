@@ -38,16 +38,17 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/sth2.STL";
 
             //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
-            //var filename = "../../../TestFiles/Square_Support.STL";
+            var filename = "../../../TestFiles/Square_Support.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
-            var filename = "../../../TestFiles/Bracket_Plate.STL";
+            //var filename = "../../../TestFiles/Bracket_Plate.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
             var solid = IO.Open(filename)[0];
             //var blankType = BlankType.RectangularBarStock;
-            var blankType = BlankType.ClosedDieForging;
+            //var blankType = BlankType.ClosedDieForging;
+            var blankType = BlankType.NearNetAdditive;
 
             ////////define cutting slice
             //double dx = 1; //uniform length of square
@@ -61,6 +62,7 @@ namespace TVGL_Test
             var averageNumSlices = 60; //could set with a dx value instead
             var enforceBuildDirection = true;
             var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices, blankType, enforceBuildDirection);
+            if (blankType == BlankType.NearNetAdditive) solid = IO.Open(filename)[0];//not really sure why this is necessary, but it is.
             Presenter.ShowAndHangHeatMap(solid, values);
         }
 
@@ -113,7 +115,7 @@ namespace TVGL_Test
                 var volumesAlongDirection = new ConcurrentBag<double[]>();
                 //foreach (var d in distances)
                 //{
-                    Parallel.ForEach(distances, d =>
+                Parallel.ForEach(distances, d =>
                 {
                     //Slice the solid and save its positive and negative side costs and volumes
                     var posXsolids = new List<TessellatedSolid>();
@@ -141,7 +143,7 @@ namespace TVGL_Test
                 outputValues.Add(direction, ObjectiveFunction3(originalCost, originalVolume, orderedCostsAlong, orderedVolumesAlong));
             }
 
-            //NormalizeValues(outputValues); // not necessary
+            NormalizeValues(outputValues); // not necessary
             foreach (var dir in outputValues)
             {
                 var points = dir.Value.Select(pair => new Point(pair[0], pair[1])).ToList();
