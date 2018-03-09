@@ -35,11 +35,14 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/WEDGE.STL";
             //var filename = "../../../TestFiles/Beam_Boss.STL";
             //var filename = "../../../TestFiles/testblock2.STL";
-            //var filename = "../../../TestFiles/sth2.STL";
+            //var filename = "../../../TestFiles/bearing bracket_x2.STL";
+            //var filename = "../../../TestFiles/Rocker.STL";
+            //var filename = "../../../TestFiles/Rocker2.STL";
+            var filename = "../../../TestFiles/SLide bracket.STL";
 
             //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
             //var filename = "../../../TestFiles/Square_Support.STL";
-            var filename = "../../../TestFiles/Aerospace_Beam.STL";
+            // var filename = "../../../TestFiles/Aerospace_Beam.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
             //var filename = "../../../TestFiles/Bracket_Plate.STL";
             //var filename = "../../../TestFiles/TieFighter.STL";
@@ -48,8 +51,8 @@ namespace TVGL_Test
             Console.WriteLine("Attempting: " + filename);
             var solid = IO.Open(filename)[0];
             //var blankType = BlankType.RectangularBarStock;
-            //var blankType = BlankType.ClosedDieForging;
-            var blankType = BlankType.NearNetAdditive;
+            var blankType = BlankType.ClosedDieForging;
+            //var blankType = BlankType.NearNetAdditive;
 
             ////////define cutting slice
             //double dx = 1; //uniform length of square
@@ -70,11 +73,12 @@ namespace TVGL_Test
         public static Dictionary<double[], List<double[]>> SliceAndGetObjectiveFunctionValues(TessellatedSolid solid, 
             int averageNumSlices, BlankType blankType, bool enforceBuildDirection)
         {
+            Presenter.ShowAndHang(solid);
             //Intitialize output dictionary. First double[] is a direciton. 
             //Second double[] is double[0] = distance along direction. double[1] = objective function value
             var outputValues = new Dictionary<double[], List<double[]>>();
             double[] originalBuildDirection;
-            var originalCost = GetCostModels.ForGivenBlankType(solid, solid, blankType, out originalBuildDirection);
+            var originalCost = GetCostModels.ForGivenBlankType(solid, solid, blankType, out originalBuildDirection, true);
             //Setting to null allows forging to consider 3 directions, not just the original build direction. However,
             //it may be preferable to enforce the build direction to get a better idea of feature effect on cost. 
             if (!enforceBuildDirection) originalBuildDirection = null; 
@@ -156,14 +160,14 @@ namespace TVGL_Test
         private static void NormalizeValues(Dictionary<double[], List<double[]>> values)
         {
             ////Now, scale all the values between 0 and 1
-            //for (var i = 0; i < values.Count; i++)
-            //{
-            //    const int y = 1; //Index for y-values
-            //    foreach (var valuePair in values.ElementAt(i).Value)
-            //    {
-            //        valuePair[y] = Math.Pow(valuePair[y], 0.1);
-            //    }
-            //}
+            for (var i = 0; i < values.Count; i++)
+            {
+                const int y = 1; //Index for y-values
+                foreach (var valuePair in values.ElementAt(i).Value)
+                {
+                    valuePair[y] = Math.Log(valuePair[y]);
+                }
+            }
 
             //Scales the values from 0 to 1
             //scale data 0 to 1 across arrays

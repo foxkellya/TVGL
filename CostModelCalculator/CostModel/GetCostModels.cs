@@ -91,13 +91,13 @@ namespace CostModelCalculator
         }
 
         public static double ForGivenBlankType(TessellatedSolid originalSolid, TessellatedSolid ts, BlankType blankType,
-            out double[] buildDirection)
+            out double[] buildDirection, bool showStock = false)
         {
             ts.Units = UnitType.millimeter; //Guess
             var searchInputs = new SearchInputs { Forging = { NumberOfOBBDirectionsToConsider = Multiplier.FromUnitless(3) } };
             var costFactory = new CostModelFactory(searchInputs);
             var subvolume = new SubVolume(originalSolid, ts, new HashSet<BlankType> { blankType }, searchInputs, null);
-            var cost = GetCostOfStock(subvolume, costFactory, blankType);
+            var cost = GetCostOfStock(subvolume, costFactory, blankType, showStock);
 
             if (blankType == BlankType.ClosedDieForging)
             {
@@ -116,10 +116,11 @@ namespace CostModelCalculator
             return cost.Dollars;
         }
 
-        private static Cost GetCostOfStock(SubVolume subVolume, ICostModelFactory costFactory, BlankType blankType)
+        private static Cost GetCostOfStock(SubVolume subVolume, ICostModelFactory costFactory, BlankType blankType,
+            bool showStock = false)
         {
             var blank = Blank.Create(blankType, subVolume, costFactory);
-            //Presenter.ShowAndHang(blank.GetStockMaterialSolid());
+            if(showStock) Presenter.ShowAndHang(blank.GetStockMaterialSolid());
 
             if (!blank.IsFeasible)
             {
