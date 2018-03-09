@@ -537,7 +537,8 @@ namespace KatanaObjects.BaseClasses
             if (blankTypes.Contains(BlankType.NearNetAdditive))
             {
                 if (buildDirection == null) AdditiveVolume = GetAdditiveVolume();
-                else AdditiveVolume = GetAdditiveVolume(new List<double[]> { buildDirection, buildDirection.multiply(-1)});
+                else AdditiveVolume = GetAdditiveVolume(new List<double[]> {buildDirection, buildDirection.multiply(-1)});
+                if(_additiveBuildDirection == null) Debug.WriteLine("build direction must be set");
                 AdditiveShapeOnPlane = GetAdditiveSilhouette();
                 AdditiveAreaOnPlane = GetAdditiveAreaOnPlane();
                 AdditivePerimeterOnPlane = GetAdditivePerimeterOnPlane();
@@ -1799,10 +1800,10 @@ namespace KatanaObjects.BaseClasses
                 //var stepSize = length / _searchInputs.WireFeedstock.NumberOfSlices.Unitless;
                 //No need it taking a step size smaller than the wire feed accuracy
                 var stepSize = _searchInputs.WireFeed.WireAccuracy.TesselatedSolidBaseUnit(SolidUnitString);
-                if (length < 2 * stepSize)
+                if (length < 5 * stepSize)
                 {
-                    AdditiveIsFeasible = false;
-                    return Volume.MaxValue;
+                    //Set a smaller step size
+                    stepSize = length / 5;
                 }
 
                 var originalDecompositionData = DirectionalDecomposition.UniformAreaDecomposition(Solid, direction, stepSize);
@@ -1818,7 +1819,8 @@ namespace KatanaObjects.BaseClasses
 
                 }
             }
-
+            
+            if (_additiveBuildDirection == null) Debug.WriteLine("Additive build direction must be set before continueing");
             if (minAdditiveVolume < Solid.Volume)
             {
                 ShowAdditiveBlank(additiveOutputData); 
