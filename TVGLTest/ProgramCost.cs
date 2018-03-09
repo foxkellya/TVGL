@@ -38,10 +38,11 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/sth2.STL";
 
             //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
-            var filename = "../../../TestFiles/Square_Support.STL";
-            //var filename = "../../../TestFiles/Aerospace_Beam.STL";
+            //var filename = "../../../TestFiles/Square_Support.STL";
+            var filename = "../../../TestFiles/Aerospace_Beam.STL";
             //var filename = "../../../TestFiles/Aerospace_Beam2.STL";
             //var filename = "../../../TestFiles/Bracket_Plate.STL";
+            //var filename = "../../../TestFiles/TieFighter.STL";
 
             //open file with TessellatedSolid function
             Console.WriteLine("Attempting: " + filename);
