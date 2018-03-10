@@ -38,7 +38,7 @@ namespace TVGL_Test
             //var filename = "../../../TestFiles/bearing bracket_x2.STL";
             //var filename = "../../../TestFiles/Rocker.STL";
             //var filename = "../../../TestFiles/Rocker2.STL";
-            var filename = "../../../TestFiles/SLide bracket.STL";
+            var filename = "../../../TestFiles/SliderBracket_mod.STL";
 
             //var filename = "../../../TestFiles/Square_Support_withPegs.STL";
             //var filename = "../../../TestFiles/Square_Support.STL";
@@ -63,7 +63,7 @@ namespace TVGL_Test
 
 
             //solid = IO.Open(filename)[0];
-            var averageNumSlices = 60; //could set with a dx value instead
+            var averageNumSlices = 30; //could set with a dx value instead
             var enforceBuildDirection = true;
             var values = SliceAndGetObjectiveFunctionValues(solid, averageNumSlices, blankType, enforceBuildDirection);
             if (blankType == BlankType.NearNetAdditive) solid = IO.Open(filename)[0];//not really sure why this is necessary, but it is.
